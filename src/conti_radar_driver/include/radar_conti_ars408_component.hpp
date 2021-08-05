@@ -23,6 +23,7 @@
 #include <radar_conti/CollisonObj.h>
 #include <radar_conti/CollisonList.h>
 
+#include <data.h>
 
 #include <chrono>
 #include <iostream>
@@ -47,7 +48,14 @@ public:
     void init(can::DriverInterfaceSharedPtr &driver_);
 
 private:
-
+    // GPS Speed
+    ros::NodeHandle n_; 
+    ros::Publisher pub_;
+    bool is_integer(float dec);
+    void send_GPS_speed();
+    void send_GPS_yaw();
+    bool is_gps_speed_sending = true;
+    int send_gps_speed = 2;
 
     ros::NodeHandle nh;
     //create CAN channel object
@@ -69,6 +77,7 @@ private:
 
     //create handle_object_list
     void handle_object_list(const can::Frame &msg);
+
     //create publish_object_map
     void publish_object_map();
 
@@ -76,7 +85,17 @@ private:
     //create map container for object list
     std::map<int,radar_conti::Object> object_map_;
 
-    std::map<int,radar_conti::Cluster> cluster_map_;
+    double gps_speed = 0;
+    double gps_altitude = 0;
+    double gps_true_course = 0;
+    double gps_satelites = 0;
+    double gps_valid = 0;
+
+    double gps_yaw_x = 0;
+    double gps_yaw_y = 0;
+    double gps_yaw_z = 0;
+
+    std::map<int, radar_conti::Cluster> cluster_map_;
 
     std::set<int> collison_objects;
     

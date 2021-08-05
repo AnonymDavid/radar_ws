@@ -2,6 +2,11 @@
 #include <iostream>
 #include <math.h>
 
+#include <ros/ros.h>
+#include "std_msgs/String.h"
+#include <can_msgs/Frame.h>
+#include <data.h>
+
 Radar_Conti::Radar_Conti(const ros::NodeHandle &nh) : nh(nh) {};
 
 void Radar_Conti::init(can::DriverInterfaceSharedPtr &driver_)
@@ -11,6 +16,10 @@ void Radar_Conti::init(can::DriverInterfaceSharedPtr &driver_)
     collison_obj_pub = nh.advertise<radar_conti::CollisonList>("radar_obj_collison",0);
     pub_cluster = nh.advertise<visualization_msgs::MarkerArray>("radar_cluster_markers",0);
     pub_cluster_list = nh.advertise<radar_conti::ClusterList>("radar_cluster_list",0);
+
+    // GPS Speed to radar
+    //Topic you want to publish
+    pub_ = n_.advertise<can_msgs::Frame>("/sent_messages", 1);
 
     this->driver_ = driver_;
     this->frame_listener_ = driver_->createMsgListenerM(this,&Radar_Conti::can_frame_callback);
@@ -30,10 +39,169 @@ void Radar_Conti::can_frame_callback(const can::Frame &msg)
     else if(operation_mode_ == 0x02)
         handle_cluster_list(msg);
 }
+// GPS speed
+bool Radar_Conti::is_integer(float dec)
+{
+        return std::floor(dec) == dec;
+}
+
+void Radar_Conti::send_GPS_speed(){
+        // Sending GPS speed
+        can_msgs::Frame output;
+         //.... do something with the input and generate the output...
+
+         output.header.stamp = ros::Time::now();
+         output.id = 768; //Decimal value of id 300
+         output.dlc = 2;
+
+         Byte b1, b2;
+         int bits1[8], bits2[8];
+         int i = 1;
+
+         double gps_speed_to_send = std::round((gps_speed+30) / 3.6 / 0.02);
+
+         while (i <= 8)
+         {
+            gps_speed_to_send /= 2;
+
+            if (is_integer(gps_speed_to_send) == 0)
+            {
+               gps_speed_to_send -= 0.5;
+               bits2[i] = 1;
+               i++;
+            }
+            else
+            {
+               bits2[i] = 0;
+               i++;
+            }
+         }
+
+         i=1;
+
+         while (i <= 5)
+         {
+            gps_speed_to_send /= 2;
+
+            if (is_integer(gps_speed_to_send) == 0)
+            {
+               gps_speed_to_send -= 0.5;
+               bits1[i] = 1;
+               i++;
+            }
+            else
+            {
+               bits1[i] = 0;
+               i++;
+            }
+         }
+
+         b1.bit1 = bits1[1];
+         b1.bit2 = bits1[2];
+         b1.bit3 = bits1[3];
+         b1.bit4 = bits1[4];
+         b1.bit5 = bits1[5];
+         b1.bit6 = 0;
+         b1.bit7 = 1;
+         b1.bit8 = 0;
+
+         b2.bit1 = bits2[1];
+         b2.bit2 = bits2[2];
+         b2.bit3 = bits2[3];
+         b2.bit4 = bits2[4];
+         b2.bit5 = bits2[5];
+         b2.bit6 = bits2[6];
+         b2.bit7 = bits2[7];
+         b2.bit8 = bits2[8];
+
+         output.data[0]= b1.byte;
+         output.data[1]= b2.byte;
+
+         //ROS_INFO_STREAM(output);
+
+         pub_.publish(output);
+}
+
+void Radar_Conti::send_GPS_yaw(){
+        // Sending GPS speed
+        can_msgs::Frame output;
+         //.... do something with the input and generate the output...
+
+         output.header.stamp = ros::Time::now();
+         output.id = 769; //Decimal value of id 300
+         output.dlc = 2;
+
+         Byte b1, b2;
+         int bits1[8], bits2[8];
+         int i = 1;
+
+         double gps_yaw_to_send = /*std::round((0 + 327.68) / 0.01)*/std::round((gps_yaw_z + 327.68) / 0.01);
+
+         while (i <= 8)
+         {
+            gps_yaw_to_send /= 2;
+
+            if (is_integer(gps_yaw_to_send) == 0)
+            {
+               gps_yaw_to_send -= 0.5;
+               bits2[i] = 1;
+               i++;
+            }
+            else
+            {
+               bits2[i] = 0;
+               i++;
+            }
+         }
+
+         i=1;
+
+         while (i <= 8)
+         {
+            gps_yaw_to_send /= 2;
+
+            if (is_integer(gps_yaw_to_send) == 0)
+            {
+               gps_yaw_to_send -= 0.5;
+               bits1[i] = 1;
+               i++;
+            }
+            else
+            {
+               bits1[i] = 0;
+               i++;
+            }
+         }
+
+         b1.bit1 = bits1[1];
+         b1.bit2 = bits1[2];
+         b1.bit3 = bits1[3];
+         b1.bit4 = bits1[4];
+         b1.bit5 = bits1[5];
+         b1.bit6 = bits1[6];
+         b1.bit7 = bits1[7];
+         b1.bit8 = bits1[8];
+
+         b2.bit1 = bits2[1];
+         b2.bit2 = bits2[2];
+         b2.bit3 = bits2[3];
+         b2.bit4 = bits2[4];
+         b2.bit5 = bits2[5];
+         b2.bit6 = bits2[6];
+         b2.bit7 = bits2[7];
+         b2.bit8 = bits2[8];
+
+         output.data[0]= b1.byte;
+         output.data[1]= b2.byte;
+
+         //ROS_INFO_STREAM(output);
+
+         pub_.publish(output);
+}
+
 void Radar_Conti::handle_object_list(const can::Frame &msg)
 {
     if (msg.id == ID_Obj_0_Status) {
-
         publish_object_map();
 
         object_list_.header.stamp = ros::Time::now();
@@ -41,11 +209,8 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
 
         object_map_.clear();
         collison_objects.clear();
-
     }
-
-
-    if (msg.id == ID_Obj_1_General) {
+    else if (msg.id == ID_Obj_1_General) {
 
         radar_conti::Object o;
         //object ID
@@ -80,8 +245,7 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         
         object_map_.insert(std::pair<int, radar_conti::Object>(id, o));
     }
-
-    if (msg.id == ID_Obj_2_Quality) {
+    else if (msg.id == ID_Obj_2_Quality) {
 
         int id = GET_Obj_2_Quality_Obj_ID(msg.data);
 
@@ -97,8 +261,11 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         object_map_[id].object_quality.obj_vrellat_rms.data =
                 CALC_Obj_2_Quality_Obj_VrelLat_rms(GET_Obj_2_Quality_Obj_VrelLat_rms(msg.data), 1.0);
 
+        object_map_[id].object_quality.obj_probofexist.data =
+                CALC_Obj_2_Quality_Obj_ProbOfExist(GET_Obj_2_Quality_Obj_ProbOfExist(msg.data), 1.0);
+
     }
-    if (msg.id == ID_Obj_3_Extended) {
+    else if (msg.id == ID_Obj_3_Extended) {
         int id = GET_Obj_3_Extended_Obj_ID(msg.data);
 
 
@@ -116,20 +283,52 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         object_map_[id].object_extended.obj_orientationangle.data =
                 CALC_Obj_3_Extended_Obj_OrientationAngle(GET_Obj_3_Extended_Obj_OrientationAngle(msg.data),
                                                             1.0);
-
+        
         object_map_[id].object_extended.obj_length.data =
-                CALC_Obj_3_Extended_Obj_Length(GET_Obj_3_Extended_Obj_Length(msg.data), 1.0);
+            CALC_Obj_3_Extended_Obj_Length(GET_Obj_3_Extended_Obj_Length(msg.data), 1.0);
 
         object_map_[id].object_extended.obj_width.data =
                 CALC_Obj_3_Extended_Obj_Width(GET_Obj_3_Extended_Obj_Width(msg.data), 1.0);
     }
-    if(msg.id == ID_Obj_4_Warning)
+    else if(msg.id == ID_Obj_4_Warning)
     {
         const int obj_war = CALC_Obj_4_Warning_Obj_ID(GET_Obj_4_Warning_Obj_ID(msg.data),1.0);
         collison_objects.insert(obj_war); 
     }
-    publish_object_map();
+    else if (msg.id == ID_GPS_SPEED) {
+        gps_speed = CALC_GPS_SPEED_SPEED_KPH(GET_GPS_SPEED_SPEED_MPH(msg.data), 1.0);
+        
+        gps_altitude = CALC_GPS_SPEED_ALTITUDE(GET_GPS_SPEED_ALTITUDE(msg.data), 1.0);
+        
+        gps_true_course = CALC_GPS_SPEED_TRUE_COURSE(GET_GPS_SPEED_TRUE_COURSE(msg.data), 1.0);
+        
+        gps_satelites = CALC_GPS_SPEED_SATELITES(GET_GPS_SPEED_SATELITES(msg.data), 1.0);
+        
+        gps_valid = CALC_GPS_SPEED_VALID(GET_GPS_SPEED_Valid(msg.data), 1.0);
+    }
+    else if (msg.id == ID_GPS_YAW) {
+        gps_yaw_x = CALC_GPS_YAW_X_YAW(GET_GPS_YAW_X_YAW(msg.data), 1.0);
+        
+        gps_yaw_y = CALC_GPS_YAW_Y_YAW(GET_GPS_YAW_Y_YAW(msg.data), 1.0);
+        
+        gps_yaw_z = CALC_GPS_YAW_Z_YAW(GET_GPS_YAW_Z_YAW(msg.data), 1.0);
+    }
 
+        if (send_gps_speed > 0){
+                send_gps_speed--;
+        }
+        else{
+                if (is_gps_speed_sending){
+                        send_GPS_speed();
+                }
+                else{
+                        send_GPS_yaw();
+                }
+                is_gps_speed_sending = !is_gps_speed_sending;
+
+                send_gps_speed = 4;
+        }
+    //publish_object_map();
 }
 void Radar_Conti::handle_cluster_list(const can::Frame &msg)
 {
@@ -192,6 +391,7 @@ void Radar_Conti::handle_cluster_list(const can::Frame &msg)
 
 
 }
+
 void Radar_Conti::publish_object_map() {
         
         std::map<int, radar_conti::Object>::iterator itr;
@@ -227,161 +427,217 @@ void Radar_Conti::publish_object_map() {
         mEgoCar.color.g = 0.0;
         mEgoCar.color.b = 1.0;
         mEgoCar.color.a = 0.4;
-        mEgoCar.lifetime = ros::Duration(0.2);
+        mEgoCar.lifetime = ros::Duration(0.25);
         mEgoCar.frame_locked = false;
 
         marker_array.markers.push_back(mEgoCar);
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
-
-                visualization_msgs::Marker mobject;
-                visualization_msgs::Marker mtext;
-
-                mtext.header.stamp = ros::Time::now();
-                mtext.header.frame_id = frame_id_;
-                mtext.ns = "text";
-                mtext.id = (itr->first+100);
-                mtext.type = 1; //Cube
-                mtext.action = 0; // add/modify
-                mtext.pose.position.x = itr->second.object_general.obj_distlong.data;
-                mtext.pose.position.y = itr->second.object_general.obj_distlat.data;
-                mtext.pose.position.z = 4.0;
-
-        
-                //myQuaternion.setRPY(M_PI / 2, 0, 0);
-                myQuaternion.setRPY(0, 0, 0);
-
-                mtext.pose.orientation.w = myQuaternion.getW();
-                mtext.pose.orientation.x = myQuaternion.getX();
-                mtext.pose.orientation.y = myQuaternion.getY();
-                mtext.pose.orientation.z = myQuaternion.getZ();
-                // mtext.scale.x = 1.0;
-                // mtext.scale.y = 1.0;
-                mtext.scale.z = 1.0;
-                mtext.color.r = 1.0;
-                mtext.color.g = 1.0;
-                mtext.color.b = 1.0;
-                mtext.color.a = 1.0;
-                mtext.lifetime = ros::Duration(0.2);
-                mtext.frame_locked = false;
-                mtext.type=9;
-
-
-                mobject.header.stamp = ros::Time::now();
-                mobject.header.frame_id = frame_id_;
-                mobject.ns = "objects";
-                mobject.id = itr->first;
-                mobject.type = 1; //Cube
-                mobject.action = 0; // add/modify
-                mobject.pose.position.x = itr->second.object_general.obj_distlong.data;
-                mobject.pose.position.y = itr->second.object_general.obj_distlat.data;
-                mobject.pose.position.z = 0.0;
-
-                myQuaternion.setRPY(0, 0, itr->second.object_extended.obj_orientationangle.data);
-                // TODO: itr->second.object_extended.obj_orientationangle.data is always 0
-                //myQuaternion.setRPY(0, 0, 2.0);
-
-                mobject.pose.orientation.w = myQuaternion.getW();
-                mobject.pose.orientation.x = myQuaternion.getX();
-                mobject.pose.orientation.y = myQuaternion.getY();
-                mobject.pose.orientation.z = myQuaternion.getZ();
-                mobject.scale.x = itr->second.object_extended.obj_length.data;
-                mobject.scale.y = itr->second.object_extended.obj_width.data;
-                mobject.scale.z = 1.0;
-                if(collison_objects.find(itr->first) != collison_objects.end())
+                if (itr->second.object_general.obj_rcs.data != 0 && itr->second.object_general.obj_distlong.data != 0 && itr->second.object_general.obj_distlat.data)
                 {
-                        mobject.color.r = 1.0;
-                        mobject.color.g = 0.0;
-                        mtext.text= "object_" + std::to_string(itr->first) + ": \n"  
-                        + " D_long: " +   std::to_string(itr->second.object_general.obj_distlong.data) + "m\n" 
-                        + " D_lat: " + std::to_string(itr->second.object_general.obj_distlat.data) + "m\n";
-                        //+ " RCS: " + std::to_string(itr->second.object_general.obj_rcs.data) + "dBm^2" + " \n" 
-                        //+ " V_long: " +   std::to_string(itr->second.object_general.obj_vrellong.data) + "m/s" + " \n" 
-                        //+ " V_lat: " + std::to_string(itr->second.object_general.obj_vrellat.data) + "m/s" + " \n" 
-                        // + " Orientation: " + std::to_string(itr->second.object_extended.obj_orientationangle.data) + "degree" + " \n"
-                        //+ " Class: " + object_classes[itr->second.object_extended.obj_class.data] +"\n"
-                        //+ " Collison with Object\n"
-                        //+ "Obj_ProbOfExist:" +   std::to_string(value);
-                        radar_conti::CollisonObj collison_item;
-                        collison_item.obj_id = itr->second.obj_id;
-                        coll_list.objects.push_back(collison_item);
-                }
-                else
-                {
-                        double value;
-                        if (itr->second.object_quality.obj_probofexist.data==7)
-                        {
-                                value=100.0;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==6)
-                        {
-                                value=99.9;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==5)
-                        {
-                                value=99.0;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==4)
-                        {
-                                value=90.0;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==3)
-                        {
-                                value=75.0;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==2)
-                        {
-                                value=50.0;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==1)
-                        {
-                                value=25.0;
-                        }
-                        else if (itr->second.object_quality.obj_probofexist.data==0)
-                        {
-                                value=0.0;
-                        }
+                        visualization_msgs::Marker mobject;
+                        visualization_msgs::Marker mtext;
+
+                        mtext.header.stamp = ros::Time::now();
+                        mtext.header.frame_id = frame_id_;
+                        mtext.ns = "text";
+                        mtext.id = (itr->first+100);
+                        mtext.type = 1; //Cube
+                        mtext.action = 0; // add/modify
+                        mtext.pose.position.x = itr->second.object_general.obj_distlong.data;
+                        mtext.pose.position.y = itr->second.object_general.obj_distlat.data;
+                        mtext.pose.position.z = 6; //4.0
+
+                        //myQuaternion.setRPY(M_PI / 2, 0, 0);
+                        myQuaternion.setRPY(0, 0, 0);
+
+                        mtext.pose.orientation.w = myQuaternion.getW();
+                        mtext.pose.orientation.x = myQuaternion.getX();
+                        mtext.pose.orientation.y = myQuaternion.getY();
+                        mtext.pose.orientation.z = myQuaternion.getZ();
+                        // mtext.scale.x = 1.0;
+                        // mtext.scale.y = 1.0;
+                        mtext.scale.z = 1.0;
+                        mtext.color.r = 1.0;
+                        mtext.color.g = 1.0;
+                        mtext.color.b = 1.0;
+                        mtext.color.a = 1.0;
+                        mtext.lifetime = ros::Duration(0.25);
+                        mtext.frame_locked = false;
+                        mtext.type=9;
+
+
+                        mobject.header.stamp = ros::Time::now();
+                        mobject.header.frame_id = frame_id_;
+                        mobject.ns = "objects";
+                        mobject.id = itr->first;
+                        mobject.type = 1; //Cube
+                        mobject.action = 0; // add/modify
+                        mobject.pose.position.x = itr->second.object_general.obj_distlong.data;
+                        mobject.pose.position.y = itr->second.object_general.obj_distlat.data;
+                        mobject.pose.position.z = 0.0;
+
+                        myQuaternion.setRPY(0, 0, itr->second.object_extended.obj_orientationangle.data);
+                        // TODO: itr->second.object_extended.obj_orientationangle.data is always 0
+                        //myQuaternion.setRPY(0, 0, 2.0);
+
+                        mobject.pose.orientation.w = myQuaternion.getW();
+                        mobject.pose.orientation.x = myQuaternion.getX();
+                        mobject.pose.orientation.y = myQuaternion.getY();
+                        mobject.pose.orientation.z = myQuaternion.getZ();
+                        mobject.scale.x = itr->second.object_extended.obj_length.data;
+                        mobject.scale.y = itr->second.object_extended.obj_width.data;
+                        mobject.scale.z = 1.0;
                         
-                        std::stringstream ss;
-                        ss << "object_" << std::fixed << std::setprecision(1) << itr->first  << "\n" 
-                        << "D_long (x): " <<   std::to_string(itr->second.object_general.obj_distlong.data) << "m" << " \n" 
-                        << "D_lat (y): " << std::to_string(itr->second.object_general.obj_distlat.data) << "m" << " \n"
-                        << "Distance: " << sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
+                        if(collison_objects.find(itr->first) != collison_objects.end())
+                        {
+                                mobject.color.r = 1.0;
+                                mobject.color.g = 0.0;
+                                mtext.text= "object_" + std::to_string(itr->first) + ": \n"  
+                                + " D_long: " +   std::to_string(itr->second.object_general.obj_distlong.data) + "m\n" 
+                                + " D_lat: " + std::to_string(itr->second.object_general.obj_distlat.data) + "m\n";
+                                //+ " RCS: " + std::to_string(itr->second.object_general.obj_rcs.data) + "dBm^2" + " \n" 
+                                //+ " V_long: " +   std::to_string(itr->second.object_general.obj_vrellong.data) + "m/s" + " \n" 
+                                //+ " V_lat: " + std::to_string(itr->second.object_general.obj_vrellat.data) + "m/s" + " \n" 
+                                // + " Orientation: " + std::to_string(itr->second.object_extended.obj_orientationangle.data) + "degree" + " \n"
+                                // + " Class: " + object_classes[itr->second.object_extended.obj_class.data] +"\n"
+                                // + " Collison with Object\n"
+                                // + "Obj_ProbOfExist:" +   std::to_string(value);
+                                radar_conti::CollisonObj collison_item;
+                                collison_item.obj_id = itr->second.obj_id;
+                                coll_list.objects.push_back(collison_item);
+                        }
+                        else
+                        {
+                                double value;
+                                if (itr->second.object_quality.obj_probofexist.data==7)
+                                {
+                                        value=100.0;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==6)
+                                {
+                                        value=99.9;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==5)
+                                {
+                                        value=99.0;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==4)
+                                {
+                                        value=90.0;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==3)
+                                {
+                                        value=75.0;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==2)
+                                {
+                                        value=50.0;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==1)
+                                {
+                                        value=25.0;
+                                }
+                                else if (itr->second.object_quality.obj_probofexist.data==0)
+                                {
+                                        value=0.0;
+                                }
+                                
+                                std::stringstream ss;
+                                ss.precision(2);
 
+                                ss << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+                                // << " D_long (x): " << itr->second.object_general.obj_distlong.data << " m\n"
+                                // << " D_lat (y): " << itr->second.object_general.obj_distlat.data << " m\n"
+                                << " Distance: " << sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2)) << " m\n"
+                                // << " Length (x): " << itr->second.object_extended.obj_length.data << " m\n"
+                                // << " Width (y): " << itr->second.object_extended.obj_width.data << " m\n"
+                                // << " Orientation: " << itr->second.object_extended.obj_orientationangle.data << "  degree\n"
+                                // << " RCS: " << std::to_string(itr->second.object_general.obj_rcs.data) // + "dBm^2" + " \n" 
+                                << " V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " \n" 
+                                << " V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " \n" 
+                                << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
+                                << "ProbOfExist: " << value << "%";
+                                mtext.text = ss.str();
+                        }
+                        // assign colors to each object ID (deterministic pseudo-random colors)
+                        int i = int(itr->first);
+                        int j = 100 - int(itr->first);
+                        int k = itr->first + 5;
+                        double r = double(i % 3) / 2.1;
+                        double g = double(j % 21) / 21;
+                        double b = double(k % 30) / 30;
+                        mobject.color.r = r;
+                        mobject.color.g = g;
+                        mobject.color.b = b;
+                        mobject.color.a = 0.6;
+                        mobject.lifetime = ros::Duration(0.25);
+                        mobject.frame_locked = false;
 
-                        // << " RCS: " << std::to_string(itr->second.object_general.obj_rcs.data) // + "dBm^2" + " \n" 
-                        //<< " V_long: " <<   std::to_string(itr->second.object_general.obj_vrellong.data) << "m/s" << " \n" 
-                        //<< " V_lat: " << std::to_string(itr->second.object_general.obj_vrellat.data) << "m/s" << " \n" 
-                        //<< " Orientation: " << std::to_string(itr->second.object_extended.obj_orientationangle.data) //+ "degree" + " \n"
-                        //<<"PO " << value;
-                        mtext.text = ss.str();
-                        //+ " Class: " + object_classes[itr->second.object_extended.obj_class.data] + "\n";
+                        //if (TODO){
+                        if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
+                                object_list_.objects.push_back(itr->second);
+                                marker_array.markers.push_back(mobject);
+                                marker_array.markers.push_back(mtext);
+                        }
+                        //}
                 }
-                // assign colors to each object ID (deterministic pseudo-random colors)
-                int i = int(itr->first);
-                int j = 100 - int(itr->first);
-                int k = itr->first + 5;
-                double r = double(i % 3) / 2.1;
-                double g = double(j % 21) / 21;
-                double b = double(k % 30) / 30;
-                mobject.color.r = r;
-                mobject.color.g = g;
-                mobject.color.b = b;
-                mobject.color.a = 0.6;
-                mobject.lifetime = ros::Duration(0.2);
-                mobject.frame_locked = false;
-
-                object_list_.objects.push_back(itr->second);
-                //if (TODO){
-                        marker_array.markers.push_back(mobject);
-                //}
-                marker_array.markers.push_back(mtext);
 
         }
+
+        // GPS TEXT
+
+        visualization_msgs::Marker gps_text;
+
+        gps_text.header.stamp = ros::Time::now();
+        gps_text.header.frame_id = frame_id_;
+        gps_text.ns = "text";
+        gps_text.id = 998;
+        gps_text.type = 1; //Cube
+        gps_text.action = 0; // add/modify
+        gps_text.pose.position.x = -10;
+        gps_text.pose.position.y = -2;
+        gps_text.pose.position.z = 5; //4.0
+
+        //myQuaternion.setRPY(M_PI / 2, 0, 0);
+        myQuaternion.setRPY(0, 0, 0);
+
+        gps_text.pose.orientation.w = myQuaternion.getW();
+        gps_text.pose.orientation.x = myQuaternion.getX();
+        gps_text.pose.orientation.y = myQuaternion.getY();
+        gps_text.pose.orientation.z = myQuaternion.getZ();
+
+        gps_text.scale.z = 1.0;
+        gps_text.color.r = 1.0;
+        gps_text.color.g = 1.0;
+        gps_text.color.b = 1.0;
+        gps_text.color.a = 1.0;
+        gps_text.lifetime = ros::Duration(0.25);
+        gps_text.frame_locked = false;
+        gps_text.type=9;
+
+        
+        std::stringstream ss2;
+        ss2.precision(2);
+
+        ss2 << std::fixed << "GPS DATA:\n"
+        << " GPS speed: " << gps_speed << " Km/h\n"
+        << " GPS altitude: " << gps_altitude << " m\n"
+        << " GPS true course: " << gps_true_course << "°\n"
+        << " GPS satelites: " << gps_satelites << "\n"
+        << " GPS valid: " << gps_valid << "\n"
+        // << " GPS yaw x: " << gps_yaw_x << "\n"
+        // << " GPS yaw y: " << gps_yaw_y << "\n"
+        // << " GPS yaw z: " << gps_yaw_z << "\n"
+        << "";
+        gps_text.text = ss2.str();
+
+        marker_array.markers.push_back(gps_text);
+
         collison_obj_pub.publish(coll_list);
         pub_objects.publish(object_list_);
         pub_marker.publish(marker_array);
-
 }
 void Radar_Conti::publish_cluster_map()
 {
