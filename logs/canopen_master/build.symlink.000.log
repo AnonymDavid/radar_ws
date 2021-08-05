@@ -1,0 +1,6 @@
+Symlinking /home/nvidia/radar_ws/devel/share/canopen_master/cmake/canopen_masterConfig-version.cmake
+Symlinking /home/nvidia/radar_ws/devel/share/canopen_master/cmake/canopen_masterConfig.cmake
+Symlinking /home/nvidia/radar_ws/devel/lib/libcanopen_master_plugin.so
+Symlinking /home/nvidia/radar_ws/devel/lib/libcanopen_master.so
+Symlinking /home/nvidia/radar_ws/devel/lib/canopen_master/canopen_bcm_sync
+Symlinking /home/nvidia/radar_ws/devel/lib/pkgconfig/canopen_master.pc

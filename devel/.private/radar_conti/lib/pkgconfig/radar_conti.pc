@@ -1,0 +1,8 @@
+prefix=/home/nvidia/radar_ws/devel/.private/radar_conti
+
+Name: radar_conti
+Description: Description of radar_conti
+Version: 0.0.0
+Cflags: -I/home/nvidia/radar_ws/devel/.private/radar_conti/include
+Libs: -L${prefix}/lib -lradar_conti
+Requires: roscpp socketcan_interface std_msgs message_runtime

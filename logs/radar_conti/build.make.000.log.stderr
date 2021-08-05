@@ -1,0 +1,28 @@
+In file included from [01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_info.cpp:4:0[m[K:
+[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/include/visibility_control.h:43:0:[m[K [01;35m[Kwarning: [m[K"RADAR_CONTI_ARS408_RADAR_CONTI_ARS408" redefined
+   #define RADAR_CONTI_ARS408_RADAR_CONTI_ARS408
+ 
+[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/include/visibility_control.h:42:0:[m[K [01;36m[Knote: [m[Kthis is the location of the previous definition
+   #define RADAR_CONTI_ARS408_RADAR_CONTI_ARS408 __attribute__ ((visibility("default")))
+ 
+[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_info.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_info.cpp:87:40:[m[K [01;35m[Kwarning: [m[K‘[01m[Kvirtual bool can::DriverInterface::init(const string&, bool)[m[K’ is deprecated: provide settings explicitly [[01;35m[K-Wdeprecated-declarations[m[K]
+         if(!radar_output->init("can1",0[01;35m[K)[m[K)
+                                        [01;35m[K^[m[K
+In file included from [01m[K/home/nvidia/radar_ws/src/ros_canopen/socketcan_interface/include/socketcan_interface/asio_base.h:4:0[m[K,
+                 from [01m[K/home/nvidia/radar_ws/src/ros_canopen/socketcan_interface/include/socketcan_interface/socketcan.h:4[m[K,
+                 from [01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_info.cpp:5[m[K:
+[01m[K/home/nvidia/radar_ws/src/ros_canopen/socketcan_interface/include/socketcan_interface/interface.h:180:65:[m[K [01;36m[Knote: [m[Kdeclared here
+     [[deprecated("provide settings explicitly")]]  virtual bool [01;36m[Kinit[m[K(const std::string &device, bool loopback) = 0;
+                                                                 [01;36m[K^~~~[m[K
+[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_conti_init.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_conti_init.cpp:13:34:[m[K [01;35m[Kwarning: [m[K‘[01m[Kvirtual bool can::DriverInterface::init(const string&, bool)[m[K’ is deprecated: provide settings explicitly [[01;35m[K-Wdeprecated-declarations[m[K]
+     if(!driver->init(can_device,0[01;35m[K)[m[K)
+                                  [01;35m[K^[m[K
+In file included from [01m[K/home/nvidia/radar_ws/src/ros_canopen/socketcan_interface/include/socketcan_interface/asio_base.h:4:0[m[K,
+                 from [01m[K/home/nvidia/radar_ws/src/ros_canopen/socketcan_interface/include/socketcan_interface/socketcan.h:4[m[K,
+                 from [01m[K/home/nvidia/radar_ws/src/conti_radar_driver/include/radar_conti_ars408_component.hpp:9[m[K,
+                 from [01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_conti_init.cpp:1[m[K:
+[01m[K/home/nvidia/radar_ws/src/ros_canopen/socketcan_interface/include/socketcan_interface/interface.h:180:65:[m[K [01;36m[Knote: [m[Kdeclared here
+     [[deprecated("provide settings explicitly")]]  virtual bool [01;36m[Kinit[m[K(const std::string &device, bool loopback) = 0;
+                                                                 [01;36m[K^~~~[m[K
