@@ -326,7 +326,7 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
                 }
                 is_gps_speed_sending = !is_gps_speed_sending;
 
-                send_gps_speed = 4;
+                send_gps_speed = 2;
         }
     //publish_object_map();
 }

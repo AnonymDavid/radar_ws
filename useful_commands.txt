@@ -1,0 +1,9 @@
+sudo date <mmddhrmnyyyy>
+	Datum, ido megvaltoztatas
+	m: month
+	d: day
+	hr: hour (24hr format)
+	mn: minute
+	yyyy: year
+
+

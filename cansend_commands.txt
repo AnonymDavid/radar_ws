@@ -1,0 +1,9 @@
+cansend can1 200#F8000000089C0000  -->  ABCD
+
+cansend can1 200#FF25800008280000  -->  ABD
+
+cansend can1 202#8E00000010  -->  2M
+
+cansend can1 202#8E000000F0  -->  5M
+
+cansend can1 202#C20007000A  -->  something probability

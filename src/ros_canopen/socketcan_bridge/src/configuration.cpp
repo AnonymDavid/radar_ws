@@ -33,7 +33,7 @@ namespace socketcan_bridge
          Byte b1, b2, b3, b4, b5, b6, b7, b8;
          int bits1[8], bits2[8], bits3[8], bits4[8], bits5[8], bits6[8], bits7[8], bits8[8];
          int i = 1;
-
+         
          b1.bit1 = RADARCFG_MAXDISTANCE_VALID;
          b1.bit2 = RADARCFG_SENSORID_VALID;
          b1.bit3 = RADARCFG_RADARPOWER_VALID;
@@ -357,6 +357,8 @@ namespace socketcan_bridge
          output.data[6]= b7.byte;
          output.data[7]= b8.byte;
 
+         ROS_INFO_STREAM(output);
+
          pub_.publish(output);
       }
 
@@ -390,8 +392,7 @@ namespace socketcan_bridge
 
          b1.bit1 = 0;
          b1.bit2 = FILTERCFG_VALID;
-         
-         
+
          if (FILTERCFG_INDEX == -1)
          {
             for (int filterIdx = 0; filterIdx <= 14; filterIdx++)
@@ -440,90 +441,90 @@ namespace socketcan_bridge
                b1.bit7 = bits1[7];
                b1.bit8 = bits1[8];
 
+               int filtercfgActive = 0;
                double filtercfg_min, filtercfg_max, filtercfg_res;
-               double filtercfg_active;
                switch (filterIdx){
                case 0:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_NOFOBJ;
                   filtercfg_min = FILTERCFG_MIN_NOFOBJ / FILTERCFG_RES_NOFOBJ;
                   filtercfg_max = FILTERCFG_MAX_NOFOBJ / FILTERCFG_RES_NOFOBJ;
                   break;
                case 1:
-                  filtercfg_active = FILTERCFG_ACTIVE_DISTANCE;
+                  filtercfgActive = FILTERCFG_ACTIVE_DISTANCE;
                   filtercfg_min = FILTERCFG_MIN_DISTANCE / FILTERCFG_RES_DISTANCE;
                   filtercfg_max = FILTERCFG_MAX_DISTANCE / FILTERCFG_RES_DISTANCE;
                   break;
                case 2:
-                  filtercfg_active = FILTERCFG_ACTIVE_AZIMUTH;
+                  filtercfgActive = FILTERCFG_ACTIVE_AZIMUTH;
                   filtercfg_min = (FILTERCFG_MIN_AZIMUTH - FILTERCFG_MINIMUM_AZIMUTH) / FILTERCFG_RES_AZIMUTH;
                   filtercfg_max = (FILTERCFG_MAX_AZIMUTH - FILTERCFG_MINIMUM_AZIMUTH) / FILTERCFG_RES_AZIMUTH;
                   break;
                case 3:
-                  filtercfg_active = FILTERCFG_ACTIVE_VRELONCOME;
+                  filtercfgActive = FILTERCFG_ACTIVE_VRELONCOME;
                   filtercfg_min = FILTERCFG_MIN_VRELONCOME / FILTERCFG_RES_VRELONCOME;
                   filtercfg_max = FILTERCFG_MAX_VRELONCOME / FILTERCFG_RES_VRELONCOME;
                   break;
                case 4:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_VRELDEPART;
                   filtercfg_min = FILTERCFG_MIN_VRELDEPART / FILTERCFG_RES_VRELDEPART;
                   filtercfg_max = FILTERCFG_MAX_VRELDEPART / FILTERCFG_RES_VRELDEPART;
                   break;
                case 5:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_RCS;
                   filtercfg_min = (FILTERCFG_MIN_RCS - FILTERCFG_MINIMUM_RCS) / FILTERCFG_RES_RCS;
                   filtercfg_max = (FILTERCFG_MAX_RCS - FILTERCFG_MINIMUM_RCS) / FILTERCFG_RES_RCS;
                   break; 
                case 6:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_LIFETIME;
                   filtercfg_min = FILTERCFG_MIN_LIFETIME / FILTERCFG_RES_LIFETIME;
                   filtercfg_max = FILTERCFG_MAX_LIFETIME / FILTERCFG_RES_LIFETIME;
                   break;
                case 7:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_SIZE;
                   filtercfg_min = FILTERCFG_MIN_SIZE / FILTERCFG_RES_SIZE;
                   filtercfg_max = FILTERCFG_MAX_SIZE / FILTERCFG_RES_SIZE;
                   break;
                case 8:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_PROBEXISTS;
                   filtercfg_min = FILTERCFG_MIN_PROBEXISTS / FILTERCFG_RES_PROBEXISTS;
                   filtercfg_max = FILTERCFG_MAX_PROBEXISTS / FILTERCFG_RES_PROBEXISTS;
                   break;
                case 9:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_Y;
                   filtercfg_min = (FILTERCFG_MIN_Y - FILTERCFG_MINIMUM_Y) / FILTERCFG_RES_Y;
                   filtercfg_max = (FILTERCFG_MAX_Y - FILTERCFG_MINIMUM_Y) / FILTERCFG_RES_Y;
                   break;
                case 10:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_X;
                   filtercfg_min = (FILTERCFG_MIN_X - FILTERCFG_MINIMUM_X) / FILTERCFG_RES_X;
                   filtercfg_max = (FILTERCFG_MAX_X - FILTERCFG_MINIMUM_X) / FILTERCFG_RES_X;
                   break;
                case 11:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_VYRIGHTLEFT;
                   filtercfg_min = FILTERCFG_MIN_VYRIGHTLEFT / FILTERCFG_RES_VYRIGHTLEFT;
                   filtercfg_max = FILTERCFG_MAX_VYRIGHTLEFT / FILTERCFG_RES_VYRIGHTLEFT;
                   break;         
                case 12:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_VXONCOME;
                   filtercfg_min = FILTERCFG_MIN_VXONCOME / FILTERCFG_RES_VXONCOME;
                   filtercfg_max = FILTERCFG_MAX_VXONCOME / FILTERCFG_RES_VXONCOME;
                   break;
                case 13:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_VYLEFTRIGHT;
                   filtercfg_min = FILTERCFG_MIN_VYLEFTRIGHT / FILTERCFG_RES_VYLEFTRIGHT;
                   filtercfg_max = FILTERCFG_MAX_VYLEFTRIGHT / FILTERCFG_RES_VYLEFTRIGHT;
                   break;
                case 14:
-                  filtercfg_active = FILTERCFG_ACTIVE_NOFOBJ;
+                  filtercfgActive = FILTERCFG_ACTIVE_VXDEPART;
                   filtercfg_min = FILTERCFG_MIN_VXDEPART / FILTERCFG_RES_VXDEPART;
                   filtercfg_max = FILTERCFG_MAX_VXDEPART / FILTERCFG_RES_VXDEPART;
                   break;            
                }
 
-               b1.bit3 = filtercfg_active;
-
                filtercfg_min = std::floor(filtercfg_min);
                filtercfg_max = std::floor(filtercfg_max);
+
+               b1.bit3 = filtercfgActive;
 
                i = 1;
                while (i <= 8)
@@ -638,14 +639,14 @@ namespace socketcan_bridge
                output.data[2]= b3.byte;
                output.data[3]= b4.byte;
                output.data[4]= b5.byte;
+               
                ROS_INFO_STREAM(output);
                pub2_.publish(output);
                sleep(1.5);
             }
          }
-         else{
-            b1.bit3 = FILTERCFG_ACTIVE;
-
+         else
+         {
             int i = 4;
             double filtercfg_index = FILTERCFG_INDEX;
             double filtercfg_type = FILTERCFG_TYPE;
@@ -684,6 +685,7 @@ namespace socketcan_bridge
                }
             }
 
+            b1.bit3 = FILTERCFG_ACTIVE;
             b1.bit4 = bits1[4];
             b1.bit5 = bits1[5];
             b1.bit6 = bits1[6];
@@ -810,7 +812,7 @@ namespace socketcan_bridge
             b3.bit6 = bits3[6];
             b3.bit7 = bits3[7];
             b3.bit8 = bits3[8];
-
+            
             i = 1;
             while (i <= 8)
             {
