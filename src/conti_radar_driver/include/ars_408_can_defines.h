@@ -269,7 +269,7 @@
 #define CALC_GPS_SPEED_SPEED_MPH(x, fmt) \
 	((x) * fmt / 100)
 	
-#define CALC_GPS_SPEED_SPEED_kPH(x, fmt) \
+#define CALC_GPS_SPEED_SPEED_KPH(x, fmt) \
 	((x) * fmt * 1.609344 / 100)
 	
 #define CALC_GPS_SPEED_ALTITUDE(x, fmt) \

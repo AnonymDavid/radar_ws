@@ -2,7 +2,7 @@
 
 if [ $1 != "" ] && [ -d `dirname "$1"` ]
 then
-	~/Desktop/runRaL.sh &
+	~/radar_ws/scripts/runRaL.sh &
 	P4=$!
 	sleep 10s
 	rosbag record -O $1 /scan /radar_objects_marker

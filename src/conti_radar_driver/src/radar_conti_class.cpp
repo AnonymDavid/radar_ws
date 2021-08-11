@@ -304,7 +304,7 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         
         gps_satelites = CALC_GPS_SPEED_SATELITES(GET_GPS_SPEED_SATELITES(msg.data), 1.0);
         
-        gps_valid = CALC_GPS_SPEED_VALID(GET_GPS_SPEED_Valid(msg.data), 1.0);
+        gps_valid = CALC_GPS_SPEED_VALID(GET_GPS_SPEED_VALID(msg.data), 1.0);
     }
     else if (msg.id == ID_GPS_YAW) {
         gps_yaw_x = CALC_GPS_YAW_X_YAW(GET_GPS_YAW_X_YAW(msg.data), 1.0);
