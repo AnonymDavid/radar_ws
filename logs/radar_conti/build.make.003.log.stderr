@@ -1,9 +1,0 @@
-[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_conti_class.cpp:[m[K In member function ‘[01m[Kvoid Radar_Conti::publish_object_map()[m[K’:
-[01m[K/home/nvidia/radar_ws/src/conti_radar_driver/src/radar_conti_class.cpp:343:25:[m[K [01;31m[Kerror: [m[Kinvalid operands of types ‘[01m[Kconst char [2][m[K’ and ‘[01m[Kconst char [7][m[K’ to binary ‘[01m[Koperator+[m[K’
-                         ss << "object_" << std::fixed << std::setprecision(1) << itr->first  << [01;31m[K"\n"[m[K
-                                                                                                 [01;31m[K~~~~[m[K
- [01;31m[K                        + " RCS: "[m[K + std::to_string(itr->second.object_general.obj_rcs.data) // + "dBm^2" + " \n"
-                         [01;31m[K^~~~~~~~~~[m[K
-make[2]: *** [CMakeFiles/radar_conti.dir/src/radar_conti_class.cpp.o] Error 1
-make[1]: *** [CMakeFiles/radar_conti.dir/all] Error 2
-make: *** [all] Error 2
