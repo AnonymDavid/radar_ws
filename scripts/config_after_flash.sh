@@ -10,7 +10,9 @@ sudo apt install ros-melodic-desktop-full -y
 echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential -y
+sudo apt autoremove
 sudo rosdep init
+sudo rosdep fix-permissions
 rosdep update
 
 sudo apt-get install ros-melodic-catkin -y
