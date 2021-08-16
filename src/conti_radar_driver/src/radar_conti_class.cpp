@@ -304,7 +304,7 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         
         gps_satelites = CALC_GPS_SPEED_SATELITES(GET_GPS_SPEED_SATELITES(msg.data), 1.0);
         
-        gps_valid = CALC_GPS_SPEED_VALID(GET_GPS_SPEED_Valid(msg.data), 1.0);
+        gps_valid = CALC_GPS_SPEED_VALID(GET_GPS_SPEED_VALID(msg.data), 1.0);
     }
     else if (msg.id == ID_GPS_YAW) {
         gps_yaw_x = CALC_GPS_YAW_X_YAW(GET_GPS_YAW_X_YAW(msg.data), 1.0);
@@ -598,7 +598,7 @@ void Radar_Conti::publish_object_map() {
         gps_text.action = 0; // add/modify
         gps_text.pose.position.x = -10;
         gps_text.pose.position.y = -2;
-        gps_text.pose.position.z = 5; //4.0
+        gps_text.pose.position.z = -5; //4.0
 
         //myQuaternion.setRPY(M_PI / 2, 0, 0);
         myQuaternion.setRPY(0, 0, 0);
@@ -627,9 +627,9 @@ void Radar_Conti::publish_object_map() {
         << " GPS true course: " << gps_true_course << "°\n"
         << " GPS satelites: " << gps_satelites << "\n"
         << " GPS valid: " << gps_valid << "\n"
-        // << " GPS yaw x: " << gps_yaw_x << "\n"
-        // << " GPS yaw y: " << gps_yaw_y << "\n"
-        // << " GPS yaw z: " << gps_yaw_z << "\n"
+        << " GPS yaw x: " << gps_yaw_x << "\n"
+        << " GPS yaw y: " << gps_yaw_y << "\n"
+        << " GPS yaw z: " << gps_yaw_z << "\n"
         << "";
         gps_text.text = ss2.str();
 

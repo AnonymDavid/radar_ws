@@ -1,3 +1,4 @@
-./devel/*
-./build/*
-./logs/*
+devel/
+build/
+logs/
+.catkin_tools/
