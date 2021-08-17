@@ -7,10 +7,10 @@ sudo apt install curl -y
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 sudo apt-get update
 sudo apt install ros-melodic-desktop-full -y
+sudo apt autoremove -y
 echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-sudo apt autoremove
 sudo rosdep init
 sudo rosdep fix-permissions
 rosdep update
