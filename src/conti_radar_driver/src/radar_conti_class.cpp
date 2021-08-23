@@ -58,7 +58,7 @@ void Radar_Conti::send_GPS_speed(){
          int bits1[8], bits2[8];
          int i = 1;
 
-         double gps_speed_to_send = std::round((gps_speed+30) / 3.6 / 0.02);
+         double gps_speed_to_send = std::round((gps_speed) / 3.6 / 0.02);
 
          while (i <= 8)
          {
