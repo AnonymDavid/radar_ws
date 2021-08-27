@@ -16,6 +16,7 @@ sudo rosdep fix-permissions
 rosdep update
 
 sudo apt-get install ros-melodic-catkin -y
+#sudo apt-get install python3-catkin-tools -y
 
 apt-get install python-catkin-tools -y
 
@@ -23,3 +24,7 @@ sudo apt-get install can-utils -y
 
 # Jetpack  4.2.1 telepitése esetén a következő parancsot is futtatni kell!
 # sudo apt-get install python3-catkin-tools
+
+# Amennyiben a catkin build parancs kiadása után nem akar buildelni egy packeget sem,
+# akkor a következő parancsot kell futtatni:
+# source /opt/ros/melodic/setup.bash
