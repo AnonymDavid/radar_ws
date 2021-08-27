@@ -28,3 +28,6 @@ sudo apt-get install can-utils -y
 # Amennyiben a catkin build parancs kiadása után nem akar buildelni egy packeget sem,
 # akkor a következő parancsot kell futtatni:
 # source /opt/ros/melodic/setup.bash
+
+# Jetson TX2 drive:
+# https://drive.google.com/drive/u/0/folders/1sQsHwyEITcJF3i213fPAqgnhQGdsDK3w
