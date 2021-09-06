@@ -50,9 +50,9 @@ using namespace rp::standalone::rplidar;
 
 RPlidarDriver * drv = NULL;
 
-ros::LaserScan create_msg_header(ros::Time start, std::string frame_id, 
-                    float angle_min, float angle_max, double scan_time,
-                    size_t node_count, double scan_time, float max_distance)
+sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
+                  double scan_time, float angle_min, float angle_max,
+                  float max_distance, std::string frame_id)
 {
     sensor_msgs::LaserScan scan_msg;
 
@@ -90,11 +90,11 @@ void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
                   std::string frame_id)
 {
     static int scan_count = 0;
-    sensor_msgs::LaserScan scan_msg = create_msg_header(start, frame_id, angle_min, 
-                                                    angle_max, scan_time, node_count, scan_time, max_distance);
+    sensor_msgs::LaserScan scan_msg = create_msg_header(node_count, start, scan_time, 
+                                                    angle_min, angle_max, max_distance, frame_id);
 
-    sensor_msgs::LaserScan scan_msg_important = create_msg_header(start, frame_id, angle_min, 
-                                                    angle_max, scan_time, node_count, scan_time, max_distance);
+    sensor_msgs::LaserScan scan_msg_important = create_msg_header(node_count, start, scan_time, 
+                                                    angle_min, angle_max, max_distance, frame_id);
     /*
     scan_msg.header.stamp = start;
     scan_msg.header.frame_id = frame_id;*/
