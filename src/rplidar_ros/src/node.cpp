@@ -44,7 +44,7 @@
 #define DEG2RAD(x) ((x)*M_PI/180.)
 
 //Lidar important data
-#define DEGREE_THRESHOLD 20.0
+#define DEGREE_THRESHOLD DEG2RAD(20.0)
 
 using namespace rp::standalone::rplidar;
 
@@ -133,7 +133,7 @@ void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
                 scan_msg_important.intensities[i] = (float) (nodes[i].quality >> 2);
             }
             else {
-                if (degree < 0 + DEGREE_THRESHOLD || degree > 360 - DEGREE_THRESHOLD) {
+                if (degree < 0 + DEGREE_THRESHOLD || degree > DEG2RAD(360.0f) - DEGREE_THRESHOLD) {
                     scan_msg.ranges[i] = std::numeric_limits<float>::infinity();
                     scan_msg_important.ranges[i] = read_value;
 
@@ -162,7 +162,7 @@ void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
                 scan_msg_important.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
             }
             else {
-                if (degree < 0 + DEGREE_THRESHOLD || degree > 360 - DEGREE_THRESHOLD) {
+                if (degree < 0 + DEGREE_THRESHOLD || degree > DEG2RAD(360) - DEGREE_THRESHOLD) {
                     scan_msg.ranges[node_count-1-i] = std::numeric_limits<float>::infinity();
                     scan_msg_important.ranges[node_count-1-i] = read_value;
 

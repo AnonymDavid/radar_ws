@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /LaserScan1
+        - /LaserScan2
       Splitter Ratio: 0.5
     Tree Height: 441
   - Class: rviz/Selection
@@ -56,14 +57,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 7.700448036193848
-        Min Value: -1.3927268981933594
+        Max Value: 6.7028489112854
+        Min Value: -1.9127743244171143
         Value: true
       Axis: X
       Channel Name: intensity
       Class: rviz/LaserScan
       Color: 255; 255; 255
-      Color Transformer: AxisColor
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -88,9 +89,7 @@ Visualization Manager:
       Marker Topic: /radar_objects_marker
       Name: MarkerArray
       Namespaces:
-        ego: true
-        objects: true
-        text: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/TF
@@ -116,6 +115,36 @@ Visualization Manager:
           radar:
             {}
       Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/LaserScan
+      Color: 237; 212; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 138; 226; 52
+      Max Intensity: 47
+      Min Color: 78; 154; 6
+      Min Intensity: 47
+      Name: LaserScan
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.15000000596046448
+      Style: Flat Squares
+      Topic: /scan_important
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
       Value: true
   Enabled: true
   Global Options:
@@ -145,7 +174,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 36.00978088378906
+      Distance: 13.658276557922363
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -160,10 +189,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.38039788603782654
+      Pitch: 1.060397982597351
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.1354103088378906
+      Yaw: 3.120410680770874
     Saved: ~
 Window Geometry:
   Displays:
