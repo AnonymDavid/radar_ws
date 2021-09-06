@@ -178,11 +178,6 @@ void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
                 }
             }
 
-            if (read_value == 0.0)
-                scan_msg.ranges[node_count-1-i] = std::numeric_limits<float>::infinity();
-            else
-                scan_msg.ranges[node_count-1-i] = read_value;
-            scan_msg.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
         }
     }
 
