@@ -392,6 +392,11 @@ void Radar_Conti::handle_cluster_list(const can::Frame &msg)
 
 }
 
+bool Radar_Conti::is_speed_in_threshold(double object_speed) {
+        return (gps_speed + object_speed) < speed_threshold &&
+                (gps_speed + object_speed) > -speed_threshold;
+}
+
 void Radar_Conti::publish_object_map() {
         
         std::map<int, radar_conti::Object>::iterator itr;
@@ -433,7 +438,10 @@ void Radar_Conti::publish_object_map() {
         marker_array.markers.push_back(mEgoCar);
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
-                if (itr->second.object_general.obj_rcs.data != 0 && itr->second.object_general.obj_distlong.data != 0 && itr->second.object_general.obj_distlat.data)
+                if (itr->second.object_general.obj_rcs.data != 0 &&
+                        itr->second.object_general.obj_distlong.data != 0 &&
+                        itr->second.object_general.obj_distlat.data &&
+                        !is_speed_in_threshold((double)itr->second.object_general.obj_vrellong.data))
                 {
                         visualization_msgs::Marker mobject;
                         visualization_msgs::Marker mtext;

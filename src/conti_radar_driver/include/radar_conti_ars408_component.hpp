@@ -48,6 +48,11 @@ public:
     void init(can::DriverInterfaceSharedPtr &driver_);
 
 private:
+    //Speed threshold
+    unsigned short speed_threshold = 3;
+    bool is_speed_in_threshold(double object_speed);
+    
+
     // GPS Speed
     ros::NodeHandle n_; 
     ros::Publisher pub_;
