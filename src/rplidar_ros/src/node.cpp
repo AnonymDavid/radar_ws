@@ -36,6 +36,8 @@
 #include "sensor_msgs/LaserScan.h"
 #include "std_srvs/Empty.h"
 #include "rplidar.h"
+#include <visualization_msgs/Marker.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
@@ -86,7 +88,7 @@ sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
 void publish_closest_point(double distance)
 {
     closest_id++;
-    ros::Publisher closest_point = nh.advertise<visualization_msgs::Marker>();
+    ros::Publisher closest_point = nh.advertise<visualization_msgs::Marker>("closest_point", 0);
 
     tf2::Quaternion myQuaternion;
     myQuaternion.setRPY(0, 0, 0);
@@ -118,7 +120,7 @@ void publish_closest_point(double distance)
     std::stringstream ss;
     ss.precision(2);
 
-    ss << std::fixed << " Closest point: " << distance << " m"
+    ss << std::fixed << " Closest point: " << distance << " m";
     mtext.text = ss.str();
 
     closest_point.publish(mtext);
