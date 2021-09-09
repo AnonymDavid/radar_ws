@@ -53,6 +53,9 @@ using namespace rp::standalone::rplidar;
 RPlidarDriver * drv = NULL;
 
 static int closest_id = 0;
+ros::Publisher scan_pub;
+ros::Publisher scan_important_pub;
+ros::Publisher closest_point_pub;
 
 sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
                   double scan_time, float angle_min, float angle_max,
@@ -85,10 +88,9 @@ sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
     return scan_msg;
 }
 
-void publish_closest_point(ros::NodeHandle nh, double distance)
+void publish_closest_point(double distance)
 {
     closest_id++;
-    ros::Publisher closest_point = nh.advertise<visualization_msgs::Marker>("closest_point", 0);
 
     tf2::Quaternion myQuaternion;
     myQuaternion.setRPY(0, 0, 0);
@@ -126,14 +128,11 @@ void publish_closest_point(ros::NodeHandle nh, double distance)
     closest_point.publish(mtext);
 }
 
-void publish_scan(ros::NodeHandle nh, rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
+void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
                     ros::Time start,double scan_time, bool inverted,
                     float angle_min, float angle_max,
                     float max_distance, std::string frame_id)
 {
-    ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
-    ros::Publisher scan_pub_important = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
-
     sensor_msgs::LaserScan scan_msg = create_msg_header(node_count, start, scan_time, 
                                                     angle_min, angle_max, max_distance, frame_id);
 
@@ -215,7 +214,7 @@ void publish_scan(ros::NodeHandle nh, rplidar_response_measurement_node_hq_t *no
     if (closest_point_distance != max_distance)
         publish_closest_point(nh, closest_point_distance);
     scan_pub.publish(scan_msg);
-    scan_pub_important.publish(scan_msg_important);
+    scan_important_pub.publish(scan_msg_important);
 }
 
 bool getRPLIDARDeviceInfo(RPlidarDriver * drv)
@@ -299,6 +298,11 @@ static float getAngle(const rplidar_response_measurement_node_hq_t& node)
 int main(int argc, char * argv[]) {
     ros::init(argc, argv, "rplidar_node");
     ros::NodeHandle nh;
+
+    scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
+    scan_pub_important = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
+    closest_point = nh.advertise<visualization_msgs::Marker>("closest_point", 0);
+    
 
     std::string channel_type;
     std::string tcp_ip;
