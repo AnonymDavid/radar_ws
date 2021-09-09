@@ -157,6 +157,9 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes,size_t node_coun
 
                     scan_msg.intensities[i] = 0.0;
                     scan_msg_important.intensities[i] = (float) (nodes[i].quality >> 2);
+
+                    if (read_value < closest_point_distance)
+                        closest_point_distance = read_value;
                 }
                 else {
                     scan_msg.ranges[i] = read_value;
@@ -165,9 +168,6 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes,size_t node_coun
                     scan_msg.intensities[i] = (float) (nodes[i].quality >> 2);
                     scan_msg_important.intensities[i] = 0.0;
                 }
-
-                if (read_value < closest_point_distance)
-                    closest_point_distance = read_value;
             }
         }
     } else {
@@ -189,6 +189,9 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes,size_t node_coun
 
                     scan_msg.intensities[node_count-1-i] = 0.0;
                     scan_msg_important.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
+
+                    if (read_value < closest_point_distance)
+                        closest_point_distance = read_value;
                 }
                 else {
                     scan_msg.ranges[node_count-1-i] = read_value;
@@ -198,14 +201,14 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes,size_t node_coun
                     scan_msg_important.intensities[node_count-1-i] = 0.0;
                 }
 
-                if (read_value < closest_point_distance)
-                    closest_point_distance = read_value;
+                
             }
 
         }
     }
 
-    publish_closest_point(closest_point_distance);
+    if (closest_point_distance != max_distance)
+        publish_closest_point(closest_point_distance);
     scan_pub.publish(scan_msg);
     scan_pub_important.publish(scan_msg_important);
 }
