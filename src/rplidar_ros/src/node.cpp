@@ -49,6 +49,8 @@
 using namespace rp::standalone::rplidar;
 
 RPlidarDriver * drv = NULL;
+ros::NodeHandle nh;
+static int closest_id = 0;
 
 sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
                   double scan_time, float angle_min, float angle_max,
@@ -81,43 +83,59 @@ sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
     return scan_msg;
 }
 
-void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
-                  rplidar_response_measurement_node_hq_t *nodes,
-                  size_t node_count, ros::Time start,
-                  double scan_time, bool inverted,
-                  float angle_min, float angle_max,
-                  float max_distance,
-                  std::string frame_id)
+void publish_closest_point(double distance)
 {
-    static int scan_count = 0;
+    closest_id++;
+    ros::Publisher closest_point = nh.advertise<visualization_msgs::Marker>();
+
+    tf2::Quaternion myQuaternion;
+    myQuaternion.setRPY(0, 0, 0);
+
+    visualization_msgs::Marker mtext;
+
+    mtext.header.stamp = ros::Time::now();
+    mtext.header.frame_id = "/closest_point";
+    mtext.ns = "text";
+    mtext.id = closest_id; //erre még vissztérek
+    mtext.type = 9;
+    mtext.action = 0; // add/modify
+    mtext.pose.position.x = -6;
+    mtext.pose.position.y = -2;
+    mtext.pose.position.z = -5; //4.0
+
+    mtext.pose.orientation.w = myQuaternion.getW();
+    mtext.pose.orientation.x = myQuaternion.getX();
+    mtext.pose.orientation.y = myQuaternion.getY();
+    mtext.pose.orientation.z = myQuaternion.getZ();
+    mtext.scale.z = 1.0;
+    mtext.color.r = 1.0;
+    mtext.color.g = 1.0;
+    mtext.color.b = 1.0;
+    mtext.color.a = 1.0;
+    mtext.lifetime = ros::Duration(0.25);
+    mtext.frame_locked = false;
+
+    std::stringstream ss;
+    ss.precision(2);
+
+    ss << std::fixed << " Closest point: " << distance << " m"
+    mtext.text = ss.str();
+
+    closest_point.publish(mtext);
+}
+
+void publish_scan(rplidar_response_measurement_node_hq_t *nodes,size_t node_count, ros::Time start,double scan_time, bool inverted,float angle_min, float angle_max,float max_distance,std::string frame_id)
+{
+    ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
+    ros::Publisher scan_pub_important = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
+
     sensor_msgs::LaserScan scan_msg = create_msg_header(node_count, start, scan_time, 
                                                     angle_min, angle_max, max_distance, frame_id);
 
     sensor_msgs::LaserScan scan_msg_important = create_msg_header(node_count, start, scan_time, 
                                                     angle_min, angle_max, max_distance, frame_id);
-    /*
-    scan_msg.header.stamp = start;
-    scan_msg.header.frame_id = frame_id;*/
-    scan_count++;
-/*
-    bool reversed = (angle_max > angle_min);
-    if ( reversed ) {
-        scan_msg.angle_min =  M_PI - angle_max;
-        scan_msg.angle_max =  M_PI - angle_min;
-    } else {
-        scan_msg.angle_min =  M_PI - angle_min;
-        scan_msg.angle_max =  M_PI - angle_max;
-    }
-    scan_msg.angle_increment =
-        (scan_msg.angle_max - scan_msg.angle_min) / (double)(node_count-1);
 
-    scan_msg.scan_time = scan_time;
-    scan_msg.time_increment = scan_time / (double)(node_count-1);
-    scan_msg.range_min = 0.15;
-    scan_msg.range_max = max_distance;//8.0;
-    scan_msg.intensities.resize(node_count);
-    scan_msg.ranges.resize(node_count);
-    */
+    double closest_point_distance = max_distance;
 
     bool reversed = (angle_max > angle_min);
     bool reverse_data = (!inverted && reversed) || (inverted && !reversed);
@@ -147,6 +165,9 @@ void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
                     scan_msg.intensities[i] = (float) (nodes[i].quality >> 2);
                     scan_msg_important.intensities[i] = 0.0;
                 }
+
+                if (read_value < closest_point_distance)
+                    closest_point_distance = read_value;
             }
         }
     } else {
@@ -176,13 +197,17 @@ void publish_scan(ros::Publisher *pub, ros::Publisher *pub_important,
                     scan_msg.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
                     scan_msg_important.intensities[node_count-1-i] = 0.0;
                 }
+
+                if (read_value < closest_point_distance)
+                    closest_point_distance = read_value;
             }
 
         }
     }
 
-    pub->publish(scan_msg);
-    pub_important->publish(scan_msg_important);
+    publish_closest_point(closest_point_distance);
+    scan_pub.publish(scan_msg);
+    scan_pub_important.publish(scan_msg_important);
 }
 
 bool getRPLIDARDeviceInfo(RPlidarDriver * drv)
@@ -277,9 +302,7 @@ int main(int argc, char * argv[]) {
     float max_distance = 8.0;
     int angle_compensate_multiple = 1;//it stand of angle compensate at per 1 degree
     std::string scan_mode;
-    ros::NodeHandle nh;
-    ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
-    ros::Publisher scan_pub_important = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
+    
     ros::NodeHandle nh_private("~");
     nh_private.param<std::string>("channel_type", channel_type, "serial");
     nh_private.param<std::string>("tcp_ip", tcp_ip, "192.168.0.7"); 
@@ -428,8 +451,7 @@ int main(int argc, char * argv[]) {
                         }
                     }
   
-                    publish_scan(&scan_pub, &scan_pub_important, angle_compensate_nodes, angle_compensate_nodes_count,
-                             start_scan_time, scan_duration, inverted,
+                    publish_scan(angle_compensate_nodes, angle_compensate_nodes_count,start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
                              frame_id);
                 } else {
@@ -445,8 +467,7 @@ int main(int argc, char * argv[]) {
                     angle_min = DEG2RAD(getAngle(nodes[start_node]));
                     angle_max = DEG2RAD(getAngle(nodes[end_node]));
 
-                    publish_scan(&scan_pub,  &scan_pub_important, &nodes[start_node], end_node-start_node +1,
-                             start_scan_time, scan_duration, inverted,
+                    publish_scan(&nodes[start_node], end_node-start_node +1, start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
                              frame_id);
                }
@@ -454,8 +475,7 @@ int main(int argc, char * argv[]) {
                 // All the data is invalid, just publish them
                 float angle_min = DEG2RAD(0.0f);
                 float angle_max = DEG2RAD(359.0f);
-                publish_scan(&scan_pub,  &scan_pub_important, nodes, count,
-                             start_scan_time, scan_duration, inverted,
+                publish_scan(nodes, count, start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
                              frame_id);
             }
