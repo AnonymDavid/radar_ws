@@ -464,7 +464,7 @@ int main(int argc, char * argv[]) {
                         }
                     }
   
-                    publish_scan(nh, angle_compensate_nodes, angle_compensate_nodes_count,start_scan_time, scan_duration, inverted,
+                    publish_scan(angle_compensate_nodes, angle_compensate_nodes_count,start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
                              frame_id);
                 } else {
@@ -480,7 +480,7 @@ int main(int argc, char * argv[]) {
                     angle_min = DEG2RAD(getAngle(nodes[start_node]));
                     angle_max = DEG2RAD(getAngle(nodes[end_node]));
 
-                    publish_scan(nh, &nodes[start_node], end_node-start_node +1, start_scan_time, scan_duration, inverted,
+                    publish_scan(&nodes[start_node], end_node-start_node +1, start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
                              frame_id);
                }
@@ -488,7 +488,7 @@ int main(int argc, char * argv[]) {
                 // All the data is invalid, just publish them
                 float angle_min = DEG2RAD(0.0f);
                 float angle_max = DEG2RAD(359.0f);
-                publish_scan(nh, nodes, count, start_scan_time, scan_duration, inverted,
+                publish_scan(nodes, count, start_scan_time, scan_duration, inverted,
                              angle_min, angle_max, max_distance,
                              frame_id);
             }
