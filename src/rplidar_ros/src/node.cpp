@@ -212,7 +212,7 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
     }
 
     if (closest_point_distance != max_distance)
-        publish_closest_point(nh, closest_point_distance);
+        publish_closest_point(closest_point_distance);
     scan_pub.publish(scan_msg);
     scan_important_pub.publish(scan_msg_important);
 }
@@ -300,8 +300,8 @@ int main(int argc, char * argv[]) {
     ros::NodeHandle nh;
 
     scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
-    scan_pub_important = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
-    closest_point = nh.advertise<visualization_msgs::Marker>("closest_point", 0);
+    scan_important_pub = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
+    closest_point_pub = nh.advertise<visualization_msgs::Marker>("closest_point", 0);
     
 
     std::string channel_type;
