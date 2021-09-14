@@ -3,12 +3,8 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /Global Options1
-        - /Status1
-        - /LaserScan1
-        - /LaserScan2
-      Splitter Ratio: 0.5
+      Expanded: ~
+      Splitter Ratio: 0.5558823347091675
     Tree Height: 441
   - Class: rviz/Selection
     Name: Selection
@@ -28,7 +24,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: Lidar
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -54,6 +50,42 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        base_link:
+          Value: true
+        closest_point:
+          Value: true
+        laser:
+          Value: true
+        radar:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        base_link:
+          closest_point:
+            {}
+          laser:
+            {}
+          radar:
+            {}
+      Update Interval: 0
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /radar_objects_marker
+      Name: Radar
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -72,7 +104,7 @@ Visualization Manager:
       Max Intensity: 47
       Min Color: 0; 0; 0
       Min Intensity: 47
-      Name: LaserScan
+      Name: Lidar
       Position Transformer: XYZ
       Queue Size: 100
       Selectable: true
@@ -83,38 +115,6 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /radar_objects_marker
-      Name: MarkerArray
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/TF
-      Enabled: true
-      Frame Timeout: 15
-      Frames:
-        All Enabled: true
-        base_link:
-          Value: true
-        laser:
-          Value: true
-        radar:
-          Value: true
-      Marker Scale: 1
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: true
-      Tree:
-        base_link:
-          laser:
-            {}
-          radar:
-            {}
-      Update Interval: 0
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -134,7 +134,7 @@ Visualization Manager:
       Max Intensity: 47
       Min Color: 78; 154; 6
       Min Intensity: 47
-      Name: LaserScan
+      Name: Lidar_important
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
@@ -145,6 +145,15 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /closest_point
+      Name: Lidar_closest_point
+      Namespaces:
+        objects: true
+        text: true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -174,7 +183,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.658276557922363
+      Distance: 31.49864959716797
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -189,10 +198,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.060397982597351
+      Pitch: 0.6603983640670776
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.120410680770874
+      Yaw: 3.145411252975464
     Saved: ~
 Window Geometry:
   Displays:

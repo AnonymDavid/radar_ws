@@ -58,9 +58,7 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     ros::Subscriber sub = n.subscribe<sensor_msgs::LaserScan>("/scan", 1000, scanCallback);
-    //Lidar important data
-    ros::Subscriber subImportant = n.subscribe<sensor_msgs::LaserScan>("/scan_important", 1000, scanCallback);
-
+    
     ros::spin();
 
     return 0;

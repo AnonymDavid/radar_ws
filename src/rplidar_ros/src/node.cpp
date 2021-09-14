@@ -36,8 +36,10 @@
 #include "sensor_msgs/LaserScan.h"
 #include "std_srvs/Empty.h"
 #include "rplidar.h"
+#include <visualization_msgs/MarkerArray.h>
 #include <visualization_msgs/Marker.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <math.h> 
 
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
@@ -88,44 +90,71 @@ sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
     return scan_msg;
 }
 
-void publish_closest_point(double distance)
+void publish_closest_point(double pos_x, double pos_y, double distance)
 {
-    closest_id++;
+        visualization_msgs::MarkerArray marker_array;
+        visualization_msgs::Marker closest_text;
+        visualization_msgs::Marker closest_point;
 
-    tf2::Quaternion myQuaternion;
-    myQuaternion.setRPY(0, 0, 0);
+        tf2::Quaternion myQuaternion;
+        myQuaternion.setRPY(0, 0, 0);
 
-    visualization_msgs::Marker mtext;
+        closest_point.header.stamp = ros::Time::now();
+        closest_point.header.frame_id = "closest_point";
+        closest_point.ns = "objects";
+        closest_point.type = 1; //Cube
+        closest_point.action = 0; // add/modify
 
-    mtext.header.stamp = ros::Time::now();
-    mtext.header.frame_id = "/closest_point";
-    mtext.ns = "text";
-    mtext.id = closest_id; //erre még vissztérek
-    mtext.type = 9;
-    mtext.action = 0; // add/modify
-    mtext.pose.position.x = -6;
-    mtext.pose.position.y = -2;
-    mtext.pose.position.z = -5; //4.0
+        closest_point.pose.position.x = pos_x;
+        closest_point.pose.position.y = pos_y;
+        closest_point.pose.position.z = 0.0;
+        closest_point.pose.orientation.w = myQuaternion.getW();
+        closest_point.pose.orientation.x = myQuaternion.getX();
+        closest_point.pose.orientation.y = myQuaternion.getY();
+        closest_point.pose.orientation.z = myQuaternion.getZ();
+        closest_point.scale.x = 0.3;
+        closest_point.scale.y = 0.3;
+        closest_point.scale.z = 0.3;
 
-    mtext.pose.orientation.w = myQuaternion.getW();
-    mtext.pose.orientation.x = myQuaternion.getX();
-    mtext.pose.orientation.y = myQuaternion.getY();
-    mtext.pose.orientation.z = myQuaternion.getZ();
-    mtext.scale.z = 1.0;
-    mtext.color.r = 1.0;
-    mtext.color.g = 1.0;
-    mtext.color.b = 1.0;
-    mtext.color.a = 1.0;
-    mtext.lifetime = ros::Duration(0.25);
-    mtext.frame_locked = false;
+        closest_point.color.r = 0;
+        closest_point.color.g = 255;
+        closest_point.color.b = 0;
+        closest_point.color.a = 0.6;
+        closest_point.lifetime = ros::Duration(0.25);
+        closest_point.frame_locked = false;
 
-    std::stringstream ss;
-    ss.precision(2);
+        closest_text.header.stamp = ros::Time::now();
+        closest_text.header.frame_id = "closest_point";
+        closest_text.ns = "text";
+        closest_text.id = 998;
+        closest_text.type = 9; // Text
+        closest_text.action = 0; // add/modify
 
-    ss << std::fixed << " Closest point: " << distance << " m";
-    mtext.text = ss.str();
+        closest_text.pose.position.x = pos_x;
+        closest_text.pose.position.y = pos_y;
+        closest_text.pose.position.z = 4; //4.0
+        closest_text.pose.orientation.w = myQuaternion.getW();
+        closest_text.pose.orientation.x = myQuaternion.getX();
+        closest_text.pose.orientation.y = myQuaternion.getY();
+        closest_text.pose.orientation.z = myQuaternion.getZ();
+        closest_text.scale.z = 1.0;
 
-    closest_point.publish(mtext);
+        closest_text.color.r = 1.0;
+        closest_text.color.g = 1.0;
+        closest_text.color.b = 1.0;
+        closest_text.color.a = 1.0;
+        closest_text.lifetime = ros::Duration(0.25);
+        closest_text.frame_locked = false;
+        
+        std::stringstream ss2;
+        ss2.precision(2);
+        ss2 << std::fixed << " Closest point: " << distance << " m";
+        closest_text.text = ss2.str();
+
+
+        marker_array.markers.push_back(closest_point);
+        marker_array.markers.push_back(closest_text);
+        closest_point_pub.publish(marker_array);
 }
 
 void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_count,
@@ -139,7 +168,7 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
     sensor_msgs::LaserScan scan_msg_important = create_msg_header(node_count, start, scan_time, 
                                                     angle_min, angle_max, max_distance, frame_id);
 
-    double closest_point_distance = max_distance;
+    short closest_point_id = -1;
 
     bool reversed = (angle_max > angle_min);
     bool reverse_data = (!inverted && reversed) || (inverted && !reversed);
@@ -162,8 +191,8 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
                     scan_msg.intensities[i] = 0.0;
                     scan_msg_important.intensities[i] = (float) (nodes[i].quality >> 2);
 
-                    if (read_value < closest_point_distance)
-                        closest_point_distance = read_value;
+                    if (closest_point_id == -1 || read_value < scan_msg_important.ranges[closest_point_id])
+                        closest_point_id = i;
                 }
                 else {
                     scan_msg.ranges[i] = read_value;
@@ -194,8 +223,8 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
                     scan_msg.intensities[node_count-1-i] = 0.0;
                     scan_msg_important.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
 
-                    if (read_value < closest_point_distance)
-                        closest_point_distance = read_value;
+                    if (closest_point_id == -1 || read_value < scan_msg_important.ranges[closest_point_id])
+                        closest_point_id = node_count-1-i;
                 }
                 else {
                     scan_msg.ranges[node_count-1-i] = read_value;
@@ -211,8 +240,21 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
         }
     }
 
-    if (closest_point_distance != max_distance)
-        publish_closest_point(closest_point_distance);
+    if (closest_point_id != -1) {
+        float distance = scan_msg_important.ranges[closest_point_id];
+        float pos_x, pos_y;
+        if(closest_point_id == 0) {
+            pos_x = scan_msg_important.ranges[closest_point_id];
+            pos_y = 0;
+        }
+        else {
+            float degree = closest_point_id * scan_msg_important.angle_increment;
+            pos_y = sin(degree) * distance;
+            pos_x = cos(degree) * distance;
+        }
+        publish_closest_point(pos_x, pos_y, distance);
+    }
+    
     scan_pub.publish(scan_msg);
     scan_important_pub.publish(scan_msg_important);
 }
@@ -301,7 +343,7 @@ int main(int argc, char * argv[]) {
 
     scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
     scan_important_pub = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
-    closest_point_pub = nh.advertise<visualization_msgs::Marker>("closest_point", 0);
+    closest_point_pub = nh.advertise<visualization_msgs::MarkerArray>("closest_point", 1000);
     
 
     std::string channel_type;
