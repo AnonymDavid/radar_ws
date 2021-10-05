@@ -102,6 +102,7 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         closest_point.header.stamp = ros::Time::now();
         closest_point.header.frame_id = "closest_point";
         closest_point.ns = "objects";
+        closest_point.id = 998;
         closest_point.type = 1; //Cube
         closest_point.action = 0; // add/modify
 
@@ -254,7 +255,7 @@ void publish_scan(rplidar_response_measurement_node_hq_t *nodes, size_t node_cou
         }
         publish_closest_point(pos_x, pos_y, distance);
     }
-    
+
     scan_pub.publish(scan_msg);
     scan_important_pub.publish(scan_msg_important);
 }

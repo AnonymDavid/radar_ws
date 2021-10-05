@@ -42,18 +42,18 @@ int main( int argc, char** argv )
 
     golf_marker.action = visualization_msgs::Marker::ADD;
 
-    golf_marker.pose.position.x = 0;
-    golf_marker.pose.position.y = 0;
-    golf_marker.pose.position.z = 0;
+    golf_marker.pose.position.x = -1.4;
+    golf_marker.pose.position.y =  0.3;
+    golf_marker.pose.position.z = -0.15;
 
     golf_marker.pose.orientation.x = 0.707;
     golf_marker.pose.orientation.y = 0;
     golf_marker.pose.orientation.z = 0;
     golf_marker.pose.orientation.w = 0.707;
 
-    golf_marker.scale.x = 0.01;
-    golf_marker.scale.y = 0.01;
-    golf_marker.scale.z = 0.01;
+    golf_marker.scale.x = 0.007;
+    golf_marker.scale.y = 0.007;
+    golf_marker.scale.z = 0.007;
 
     golf_marker.color.r = 0.5f;
     golf_marker.color.g = 0.5f;
