@@ -36,14 +36,14 @@ const int FILTERCFG_ACTIVE = 1; // Activate filter configuration
 const int FILTERCFG_INDEX = -1; // Multiplexor to specify which filter criterion to configure (-1: all)
 const int FILTERCFG_TYPE = 1; // Choose between objects and clusters 0 cluster - 1 object
 // Index 0. Clusters and objects
-const int FILTERCFG_ACTIVE_NOFOBJ = 0;
+const int FILTERCFG_ACTIVE_NOFOBJ = 1;
 const double FILTERCFG_MIN_NOFOBJ = 0; // Number of clusters or objects 0 - 4095
 const double FILTERCFG_MAX_NOFOBJ = 3;
 const double FILTERCFG_RES_NOFOBJ = 1;
 // Index 1. Clusters and objects
-const int FILTERCFG_ACTIVE_DISTANCE = 0;
+const int FILTERCFG_ACTIVE_DISTANCE = 1;
 const double FILTERCFG_MIN_DISTANCE = 0; // Radial distance 0 - 409.5 m 
-const double FILTERCFG_MAX_DISTANCE = 30;
+const double FILTERCFG_MAX_DISTANCE = 409.5;
 const double FILTERCFG_RES_DISTANCE = 0.1;
 // Index 2. Clusters and objects
 const int FILTERCFG_ACTIVE_AZIMUTH = 0;
@@ -62,9 +62,9 @@ const double FILTERCFG_MIN_VRELDEPART = 0; // Radial velocity in sensor line-of-
 const double FILTERCFG_MAX_VRELDEPART = 128.993; // 0 - 128.993 m/s
 const double FILTERCFG_RES_VRELDEPART= 0.0315;
 // Index 5. Clusters and objects
-const int FILTERCFG_ACTIVE_RCS = 0;
+const int FILTERCFG_ACTIVE_RCS = 1;
 const double FILTERCFG_MIN_RCS = -20; // Radar Cross Section -50 - 52.375 dBm2
-const double FILTERCFG_MAX_RCS = 52.375;
+const double FILTERCFG_MAX_RCS = 20;
 const double FILTERCFG_MINIMUM_RCS = -50;
 const double FILTERCFG_RES_RCS = 0.025;
 // Index 6. Objects
@@ -83,15 +83,15 @@ const double FILTERCFG_MIN_PROBEXISTS = 5; // Probability of existence
 const double FILTERCFG_MAX_PROBEXISTS = 7; //  0 0% - 1 25 % - 2 50 % - 3 75 % - 4 90 % - 5 99 % - 6 99.9 % - 7 100 %
 const double FILTERCFG_RES_PROBEXISTS = 1;
 // Index 9. Objects
-const int FILTERCFG_ACTIVE_Y = 0;
-const double FILTERCFG_MIN_Y = -409.5; // Lateral distance -409.5 - 409.5 m
-const double FILTERCFG_MAX_Y = 409.5;
+const int FILTERCFG_ACTIVE_Y = 1;
+const double FILTERCFG_MIN_Y = -1.7; // Lateral distance -409.5 - 409.5 m
+const double FILTERCFG_MAX_Y = 1.7;
 const double FILTERCFG_MINIMUM_Y = -409.5;
 const double FILTERCFG_RES_Y = 0.2;
 // Index 10. Objects
-const int FILTERCFG_ACTIVE_X = 0;
-const double FILTERCFG_MIN_X = -10; // Longitudinal distance -500 - 1138.2 m
-const double FILTERCFG_MAX_X = 260;
+const int FILTERCFG_ACTIVE_X = 1;
+const double FILTERCFG_MIN_X = 0; // Longitudinal distance -500 - 1138.2 m
+const double FILTERCFG_MAX_X = 35;
 const double FILTERCFG_MINIMUM_X = -500;
 const double FILTERCFG_RES_X = 0.2;
 // Index 11. Objects
