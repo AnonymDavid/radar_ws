@@ -55,9 +55,9 @@ int main( int argc, char** argv )
     golf_marker.scale.y = 0.007;
     golf_marker.scale.z = 0.007;
 
-    golf_marker.color.r = 0.5f;
-    golf_marker.color.g = 0.5f;
-    golf_marker.color.b = 0.5f;
+    golf_marker.color.r = 0.8f;
+    golf_marker.color.g = 0.8f;
+    golf_marker.color.b = 0.8f;
     golf_marker.color.a = 1.0;
 
     golf_marker.lifetime = ros::Duration();
