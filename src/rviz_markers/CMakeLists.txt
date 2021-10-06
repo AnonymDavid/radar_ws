@@ -136,14 +136,14 @@ include_directories(
 #   src/${PROJECT_NAME}/rviz_markers.cpp
 # )
 
-add_executable(traffic_light src/traffic_light.cpp)
-add_executable(drone src/drone.cpp)
+# add_executable(traffic_light src/traffic_light.cpp)
+# add_executable(drone src/drone.cpp)
 add_executable(egolf src/egolf.cpp)
-target_link_libraries(traffic_light ${catkin_LIBRARIES})
-target_link_libraries(drone ${catkin_LIBRARIES})
+# target_link_libraries(traffic_light ${catkin_LIBRARIES})
+# target_link_libraries(drone ${catkin_LIBRARIES})
 target_link_libraries(egolf ${catkin_LIBRARIES})
-add_dependencies(traffic_light  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(drone  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(traffic_light  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(drone  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(egolf  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
@@ -185,9 +185,9 @@ add_dependencies(egolf  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TA
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-catkin_install_python(PROGRAMS
-   scripts/change_state.py scripts/place_light.py
-   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+# catkin_install_python(PROGRAMS
+#   scripts/change_state.py scripts/place_light.py
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
 # install(TARGETS ${PROJECT_NAME}_node
