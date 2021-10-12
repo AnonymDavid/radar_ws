@@ -32,6 +32,7 @@
 #include <math.h>
 #include <cstddef>
 #include <set>
+#include <stdlib.h>
 
 
 
@@ -72,6 +73,9 @@ private:
     ros::Publisher pub_objects;
     ros::Publisher pub_cluster;
     ros::Publisher pub_cluster_list;
+    ros::Publisher pub_marker_with_all_data;
+    ros::Publisher pub_gps_data;
+    ros::Publisher pub_closest_marker;
     ros::Publisher collison_obj_pub;
     std::string pub_marker_array_topic_name = "/ars408/marker_array";
     // std::string pub_object_list_topic_name = "/ars408/objectlist";
@@ -85,6 +89,11 @@ private:
 
     //create publish_object_map
     void publish_object_map();
+    void publish_radar_data();
+    void publish_radar_with_all_data();
+    void publish_radar_closest_data();
+    void publish_gps_data();
+    double prob_of_exist_data(int data);
 
     void publish_cluster_map();
     //create map container for object list
