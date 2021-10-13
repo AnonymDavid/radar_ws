@@ -89,10 +89,6 @@ private:
 
     //create publish_object_map
     void publish_object_map();
-    void publish_radar_data();
-    void publish_radar_with_all_data();
-    void publish_radar_closest_data();
-    void publish_gps_data();
     double prob_of_exist_data(int data);
 
     void publish_cluster_map();
