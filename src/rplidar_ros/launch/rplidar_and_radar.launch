@@ -9,6 +9,11 @@
   </node>
   <node pkg="tf2_ros" type="static_transform_publisher" name="lidar_broadcaster" args="1 0 0 3.141593 0 0 base_link laser" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="radar_broadcaster" args="1 0 0 0 0 0 base_link radar" />
+  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="radar_closest_broadcaster" args="1 0 0 0 0 0 base_link radar_closest" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="gps_broadcaster" args="1 0 0 0 0 0 base_link gps_data" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="radar_all_broadcaster" args="1 0 0 0 0 0 base_link radar_all_data" />
+  
   <node pkg="tf2_ros" type="static_transform_publisher" name="closest_point_broadcaster" args="1 0 0 0 0 0 base_link closest_point" />
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/rplidar_and_radar.rviz" />

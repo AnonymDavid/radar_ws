@@ -16,9 +16,9 @@ void Radar_Conti::init(can::DriverInterfaceSharedPtr &driver_)
     collison_obj_pub = nh.advertise<radar_conti::CollisonList>("radar_obj_collison",0);
     pub_cluster = nh.advertise<visualization_msgs::MarkerArray>("radar_cluster_markers",0);
     pub_cluster_list = nh.advertise<radar_conti::ClusterList>("radar_cluster_list",0);
-    pub_marker_with_all_data = nh.advertise<radar_conti::MarkerArray>("radar_marker_with_all_data",0);
-    pub_gps_data = nh.advertise<radar_conti::MarkerArray>("gps_data",0);
-    pub_closest_marker = nh.advertise<radar_conti::MarkerArray>("radar_closest_marker",0);
+    pub_marker_with_all_data = nh.advertise<visualization_msgs::MarkerArray>("radar_marker_with_all_data",0);
+    pub_gps_data = nh.advertise<visualization_msgs::Marker>("gps_data",0);
+    pub_closest_marker = nh.advertise<visualization_msgs::MarkerArray>("radar_closest_marker",0);
 
     // GPS Speed to radar
     //Topic you want to publish
@@ -401,16 +401,63 @@ bool Radar_Conti::is_speed_in_threshold(double object_speed) {
 }
 
 void Radar_Conti::publish_object_map() {
-        publish_radar_data();
-        publish_radar_with_all_data();
-        publish_radar_closest_data();
-        publish_gps_data();
+        //publish_radar_data();
+        //publish_radar_with_all_data();
+        //publish_radar_closest_data();
+        //publish_gps_data();
+/*
+        visualization_msgs::Marker gps_text;
+        */tf2::Quaternion myQuaternion;/*
 
-        /*std::map<int, radar_conti::Object>::iterator itr;
+        gps_text.header.stamp = ros::Time::now();
+        gps_text.header.frame_id = "gps_data";
+        gps_text.ns = "text";
+        gps_text.id = 998;
+        gps_text.type = 1; //Cube
+        gps_text.action = 0; // add/modify
+        gps_text.pose.position.x = -10;
+        gps_text.pose.position.y = -2;
+        gps_text.pose.position.z = -5; //4.0
+
+        //myQuaternion.setRPY(M_PI / 2, 0, 0);
+        myQuaternion.setRPY(0, 0, 0);
+
+        gps_text.pose.orientation.w = myQuaternion.getW();
+        gps_text.pose.orientation.x = myQuaternion.getX();
+        gps_text.pose.orientation.y = myQuaternion.getY();
+        gps_text.pose.orientation.z = myQuaternion.getZ();
+
+        gps_text.scale.z = 1.0;
+        gps_text.color.r = 1.0;
+        gps_text.color.g = 1.0;
+        gps_text.color.b = 1.0;
+        gps_text.color.a = 1.0;
+        gps_text.lifetime = ros::Duration(0.25);
+        gps_text.frame_locked = false;
+        gps_text.type=9;
+
+        
+        std::stringstream ss2;
+        ss2.precision(2);
+
+        ss2 << std::fixed << "GPS DATA:\n"
+        << " GPS speed: " << gps_speed << " Km/h\n"
+        << " GPS altitude: " << gps_altitude << " m\n"
+        << " GPS true course: " << gps_true_course << "°\n"
+        << " GPS satelites: " << gps_satelites << "\n"
+        << " GPS valid: " << gps_valid << "\n"
+        << " GPS yaw x: " << gps_yaw_x << "\n"
+        << " GPS yaw y: " << gps_yaw_y << "\n"
+        << " GPS yaw z: " << gps_yaw_z << "\n";
+        gps_text.text = ss2.str();
+
+        pub_gps_data.publish(gps_text);
+*/
+        std::map<int, radar_conti::Object>::iterator itr;
 
         visualization_msgs::MarkerArray marker_array;
 
-        //marker for ego car
+  /*      //marker for ego car
         visualization_msgs::Marker mEgoCar;
 
         mEgoCar.header.stamp = ros::Time::now();
@@ -443,7 +490,7 @@ void Radar_Conti::publish_object_map() {
         mEgoCar.frame_locked = false;
 
         marker_array.markers.push_back(mEgoCar);
-
+*/
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
                         itr->second.object_general.obj_distlong.data != 0 &&
@@ -605,7 +652,7 @@ void Radar_Conti::publish_object_map() {
         visualization_msgs::Marker gps_text;
 
         gps_text.header.stamp = ros::Time::now();
-        gps_text.header.frame_id = frame_id_;
+        gps_text.header.frame_id = "/gps_data";
         gps_text.ns = "text";
         gps_text.id = 998;
         gps_text.type = 1; //Cube
@@ -647,16 +694,17 @@ void Radar_Conti::publish_object_map() {
         << "";
         gps_text.text = ss2.str();
 
-        marker_array.markers.push_back(gps_text);
+        //marker_array.markers.push_back(gps_text);
 
         collison_obj_pub.publish(coll_list);
         pub_objects.publish(object_list_);
-        pub_marker.publish(marker_array);*/
+        pub_marker.publish(marker_array);
+        pub_gps_data.publish(gps_text);
 }
 
 double Radar_Conti::prob_of_exist_data(int data)
 {
-        switch (closest_itr->second.object_quality.obj_probofexist.data) {
+        switch (data) {
                 case 7:
                         return 100.0;
                 case 6:
@@ -681,9 +729,10 @@ void Radar_Conti::publish_gps_data()
 {
         visualization_msgs::MarkerArray marker_array;
         visualization_msgs::Marker gps_text;
+        tf2::Quaternion myQuaternion;
 
         gps_text.header.stamp = ros::Time::now();
-        gps_text.header.frame_id = frame_id_;
+        gps_text.header.frame_id = "gps_data";
         gps_text.ns = "text";
         gps_text.id = 998;
         gps_text.type = 1; //Cube
@@ -721,8 +770,7 @@ void Radar_Conti::publish_gps_data()
         << " GPS valid: " << gps_valid << "\n"
         << " GPS yaw x: " << gps_yaw_x << "\n"
         << " GPS yaw y: " << gps_yaw_y << "\n"
-        << " GPS yaw z: " << gps_yaw_z << "\n"
-        << "";
+        << " GPS yaw z: " << gps_yaw_z << "\n";
         gps_text.text = ss2.str();
 
         marker_array.markers.push_back(gps_text);
@@ -734,6 +782,7 @@ void Radar_Conti::publish_radar_closest_data()
         std::map<int, radar_conti::Object>::iterator itr;
         std::map<int, radar_conti::Object>::iterator closest_itr = object_map_.begin();
         visualization_msgs::MarkerArray marker_array;
+        tf2::Quaternion myQuaternion;
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
@@ -742,7 +791,7 @@ void Radar_Conti::publish_radar_closest_data()
                         !is_speed_in_threshold((double)itr->second.object_general.obj_vrellong.data)*/)
                 {
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
-                        float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2))
+                        float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
                         if (itr_distance < closest_distance) {
                                 closest_itr = itr;
                         }
@@ -753,7 +802,7 @@ void Radar_Conti::publish_radar_closest_data()
         visualization_msgs::Marker mtext;
 
         mtext.header.stamp = ros::Time::now();
-        mtext.header.frame_id = frame_id_;
+        mtext.header.frame_id = "radar_closest";
         mtext.ns = "text";
         mtext.id = (closest_itr->first+100);
         mtext.type = 1; //Cube
@@ -777,7 +826,7 @@ void Radar_Conti::publish_radar_closest_data()
         mtext.type=9;
 
         mobject.header.stamp = ros::Time::now();
-        mobject.header.frame_id = frame_id_;
+        mobject.header.frame_id = "radar_closest";
         mobject.ns = "objects";
         mobject.id = closest_itr->first;
         mobject.type = 1; //Cube
@@ -832,6 +881,7 @@ void Radar_Conti::publish_radar_with_all_data()
 {
         std::map<int, radar_conti::Object>::iterator itr;
         visualization_msgs::MarkerArray marker_array;
+        tf2::Quaternion myQuaternion;
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
@@ -843,7 +893,7 @@ void Radar_Conti::publish_radar_with_all_data()
                         visualization_msgs::Marker mtext;
 
                         mtext.header.stamp = ros::Time::now();
-                        mtext.header.frame_id = frame_id_;
+                        mtext.header.frame_id = "radar_all_data";
                         mtext.ns = "text";
                         mtext.id = (itr->first+100);
                         mtext.type = 1; //Cube
@@ -868,7 +918,7 @@ void Radar_Conti::publish_radar_with_all_data()
 
 
                         mobject.header.stamp = ros::Time::now();
-                        mobject.header.frame_id = frame_id_;
+                        mobject.header.frame_id = "radar_all_data";
                         mobject.ns = "objects";
                         mobject.id = itr->first;
                         mobject.type = 1; //Cube
@@ -926,6 +976,7 @@ void Radar_Conti::publish_radar_data()
 {
         std::map<int, radar_conti::Object>::iterator itr;
         visualization_msgs::MarkerArray marker_array;
+        tf2::Quaternion myQuaternion;
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
@@ -1024,6 +1075,55 @@ void Radar_Conti::publish_radar_data()
                         }
                 }
         }
+
+
+        visualization_msgs::Marker gps_text;
+
+        gps_text.header.stamp = ros::Time::now();
+        gps_text.header.frame_id = frame_id_;
+        gps_text.ns = "text";
+        gps_text.id = 998;
+        gps_text.type = 1; //Cube
+        gps_text.action = 0; // add/modify
+        gps_text.pose.position.x = -10;
+        gps_text.pose.position.y = -2;
+        gps_text.pose.position.z = -5; //4.0
+
+        //myQuaternion.setRPY(M_PI / 2, 0, 0);
+        myQuaternion.setRPY(0, 0, 0);
+
+        gps_text.pose.orientation.w = myQuaternion.getW();
+        gps_text.pose.orientation.x = myQuaternion.getX();
+        gps_text.pose.orientation.y = myQuaternion.getY();
+        gps_text.pose.orientation.z = myQuaternion.getZ();
+
+        gps_text.scale.z = 1.0;
+        gps_text.color.r = 1.0;
+        gps_text.color.g = 1.0;
+        gps_text.color.b = 1.0;
+        gps_text.color.a = 1.0;
+        gps_text.lifetime = ros::Duration(0.25);
+        gps_text.frame_locked = false;
+        gps_text.type=9;
+
+        
+        std::stringstream ss2;
+        ss2.precision(2);
+
+        ss2 << std::fixed << "GPS DATA:\n"
+        << " GPS speed: " << gps_speed << " Km/h\n"
+        << " GPS altitude: " << gps_altitude << " m\n"
+        << " GPS true course: " << gps_true_course << "°\n"
+        << " GPS satelites: " << gps_satelites << "\n"
+        << " GPS valid: " << gps_valid << "\n"
+        << " GPS yaw x: " << gps_yaw_x << "\n"
+        << " GPS yaw y: " << gps_yaw_y << "\n"
+        << " GPS yaw z: " << gps_yaw_z << "\n"
+        << "";
+        gps_text.text = ss2.str();
+
+        marker_array.markers.push_back(gps_text);
+
         collison_obj_pub.publish(coll_list);
         pub_objects.publish(object_list_);
         pub_marker.publish(marker_array);

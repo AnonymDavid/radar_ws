@@ -4,7 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /golf1
+        - /Radar_closest_object1
+        - /gps_data1
       Splitter Ratio: 0.5558823347091675
     Tree Height: 441
   - Class: rviz/Selection
@@ -25,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Lidar
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -152,7 +153,8 @@ Visualization Manager:
       Marker Topic: /closest_point
       Name: Lidar_closest_point
       Namespaces:
-        {}
+        objects: true
+        text: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -161,6 +163,30 @@ Visualization Manager:
       Name: golf
       Namespaces:
         egolf_base: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /radar_marker_with_all_data
+      Name: Radar_all_data
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /radar_closest_marker
+      Name: Radar_closest_object
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /gps_data
+      Name: gps_data
+      Namespaces:
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -191,7 +217,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 22.875293731689453
+      Distance: 23.727834701538086
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
