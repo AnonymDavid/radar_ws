@@ -755,7 +755,7 @@ void Radar_Conti::publish_object_map() {
         gps_text.type = 1; //Cube
         gps_text.action = 0; // add/modify
         gps_text.pose.position.x = -10;
-        gps_text.pose.position.y = -2;
+        gps_text.pose.position.y = 1;
         gps_text.pose.position.z = -5; //4.0
 
         myQuaternion.setRPY(0, 0, 0);

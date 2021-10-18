@@ -131,9 +131,9 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         closest_text.type = 9; // Text
         closest_text.action = 0; // add/modify
 
-        closest_text.pose.position.x = pos_x;
-        closest_text.pose.position.y = pos_y;
-        closest_text.pose.position.z = 4; //4.0
+        closest_text.pose.position.x = -4;
+        closest_text.pose.position.y = -7;
+        closest_text.pose.position.z = -5; //4.0
         closest_text.pose.orientation.w = myQuaternion.getW();
         closest_text.pose.orientation.x = myQuaternion.getX();
         closest_text.pose.orientation.y = myQuaternion.getY();
