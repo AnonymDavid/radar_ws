@@ -476,7 +476,11 @@ void Radar_Conti::publish_object_map() {
                 {
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
                         float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
-                        if (itr_distance < closest_distance) {
+                        if (itr_distance < closest_distance || (
+                                closest_itr->second.object_general.obj_rcs.data != 0 &&
+                                closest_itr->second.object_general.obj_distlong.data != 0 &&
+                                closest_itr->second.object_general.obj_distlat.data
+                        )) {
                                 closest_itr = itr;
                         }
 
@@ -657,7 +661,10 @@ void Radar_Conti::publish_object_map() {
         //******************************        ******************************
         //********************************************************************
 
-        if (closest_itr != object_map_.end()) {
+        if (closest_itr != object_map_.end() && 
+                closest_itr->second.object_general.obj_rcs.data != 0 &&
+                closest_itr->second.object_general.obj_distlong.data != 0 &&
+                closest_itr->second.object_general.obj_distlat.data) {
                 visualization_msgs::Marker mobject_closest;
                 visualization_msgs::Marker mtext_closest;
 
@@ -667,9 +674,9 @@ void Radar_Conti::publish_object_map() {
                 mtext_closest.id = (closest_itr->first+100);
                 mtext_closest.type = 1; //Cube
                 mtext_closest.action = 0; // add/modify
-                mtext_closest.pose.position.x = closest_itr->second.object_general.obj_distlong.data;
-                mtext_closest.pose.position.y = closest_itr->second.object_general.obj_distlat.data;
-                mtext_closest.pose.position.z = 6; //4.0
+                mtext_closest.pose.position.x = -10;
+                mtext_closest.pose.position.y = 1;
+                mtext_closest.pose.position.z = -5; //4.0
 
                 myQuaternion.setRPY(0, 0, 0);
                 mtext_closest.pose.orientation.w = myQuaternion.getW();
