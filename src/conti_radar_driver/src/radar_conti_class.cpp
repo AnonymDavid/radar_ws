@@ -432,6 +432,9 @@ void Radar_Conti::publish_object_map() {
         visualization_msgs::MarkerArray marker_array_closest_object;
         visualization_msgs::Marker gps_text;
 
+        visualization_msgs::Marker closest_obj;
+        visualization_msgs::Marker closest_text;
+
         tf2::Quaternion myQuaternion;
         /*
         //marker for ego car
@@ -476,14 +479,15 @@ void Radar_Conti::publish_object_map() {
                 {
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
                         float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
-                        if (itr_distance < closest_distance || (
-                                closest_itr->second.object_general.obj_rcs.data != 0 &&
-                                closest_itr->second.object_general.obj_distlong.data != 0 &&
-                                closest_itr->second.object_general.obj_distlat.data
-                        )) {
+                        /*if (closest_itr->second.object_general.obj_rcs.data == 0 && 
+                                closest_itr->second.object_general.obj_distlong.data == 0 &&
+                                closest_itr->second.object_general.obj_distlat.data == 0) {
                                 closest_itr = itr;
                         }
-
+                        else if (closest_distance > itr_distance) {
+                                closest_itr = itr;
+                        }*/
+                
                         visualization_msgs::Marker mobject;
                         visualization_msgs::Marker mobject_all;
                         visualization_msgs::Marker mtext;
@@ -600,7 +604,7 @@ void Radar_Conti::publish_object_map() {
                                 << " V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " \n" 
                                 << " V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " \n" 
                                 << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
-                                << "ProbOfExist: " << value << "%";
+                                << " ProbOfExist: " << value << "%";
                                 mtext.text = ss.str();
 
 
@@ -612,11 +616,11 @@ void Radar_Conti::publish_object_map() {
                                 << " Distance: " << itr_distance << " m\n"
                                 << " Length (x): " << itr->second.object_extended.obj_length.data << " m\n"
                                 << " Width (y): " << itr->second.object_extended.obj_width.data << " m\n"
-                                << " Orientation: " << itr->second.object_extended.obj_orientationangle.data << "  degree\n"
+                                << " Orientation: " << itr->second.object_extended.obj_orientationangle.data << "°\n"
                                 << " V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " \n" 
                                 << " V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " \n" 
                                 << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
-                                << "ProbOfExist: " << value << "%";
+                                << " ProbOfExist: " << value << "%";
                                 mtext_all.text = ss_all.str();
                                 
                         }
@@ -643,6 +647,19 @@ void Radar_Conti::publish_object_map() {
 
                         //if (TODO){
                         if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
+                                if (closest_itr->second.object_general.obj_rcs.data == 0 && 
+                                        closest_itr->second.object_general.obj_distlong.data == 0 &&
+                                        closest_itr->second.object_general.obj_distlat.data == 0) {
+                                        closest_itr = itr;
+                                        closest_obj = mobject_all;
+                                        closest_text = mtext_all;
+                                }
+                                else if (closest_distance > itr_distance) {
+                                        closest_itr = itr;
+                                        closest_obj = mobject_all;
+                                        closest_text = mtext_all;
+                                }
+
                                 object_list_.objects.push_back(itr->second);
                                 marker_array.markers.push_back(mobject);
                                 marker_array.markers.push_back(mtext);
@@ -661,18 +678,17 @@ void Radar_Conti::publish_object_map() {
         //******************************        ******************************
         //********************************************************************
 
-        if (closest_itr != object_map_.end() && 
-                closest_itr->second.object_general.obj_rcs.data != 0 &&
+        if (closest_itr->second.object_general.obj_rcs.data != 0 &&
                 closest_itr->second.object_general.obj_distlong.data != 0 &&
-                closest_itr->second.object_general.obj_distlat.data) {
+                closest_itr->second.object_general.obj_distlat.data != 0) {/*
                 visualization_msgs::Marker mobject_closest;
                 visualization_msgs::Marker mtext_closest;
 
                 mtext_closest.header.stamp = ros::Time::now();
-                mtext_closest.header.frame_id = "/radar_closest";
+                mtext_closest.header.frame_id = "/radar_closest_object";
                 mtext_closest.ns = "text";
-                mtext_closest.id = (closest_itr->first+100);
-                mtext_closest.type = 1; //Cube
+                mtext_closest.id = (closest_itr->first+300);
+                mtext_closest.type = 9; //Text
                 mtext_closest.action = 0; // add/modify
                 mtext_closest.pose.position.x = -10;
                 mtext_closest.pose.position.y = 1;
@@ -688,14 +704,13 @@ void Radar_Conti::publish_object_map() {
                 mtext_closest.color.g = 1.0;
                 mtext_closest.color.b = 1.0;
                 mtext_closest.color.a = 1.0;
-                mtext_closest.lifetime = ros::Duration(0.15);
+                mtext_closest.lifetime = ros::Duration(0.19);
                 mtext_closest.frame_locked = false;
-                mtext_closest.type=9;
 
                 mobject_closest.header.stamp = ros::Time::now();
-                mobject_closest.header.frame_id = "/radar_closest";
+                mobject_closest.header.frame_id = "/radar_closest_object";
                 mobject_closest.ns = "objects";
-                mobject_closest.id = closest_itr->first;
+                mobject_closest.id = (closest_itr->first+200);
                 mobject_closest.type = 1; //Cube
                 mobject_closest.action = 0; // add/modify
                 mobject_closest.pose.position.x = closest_itr->second.object_general.obj_distlong.data;
@@ -741,12 +756,18 @@ void Radar_Conti::publish_object_map() {
                 mobject_closest.color.g = g;
                 mobject_closest.color.b = b;
                 mobject_closest.color.a = 0.6;
-                mobject_closest.lifetime = ros::Duration(0.15);
-                mobject_closest.frame_locked = false;
+                mobject_closest.lifetime = ros::Duration(0.19);
+                mobject_closest.frame_locked = false;*/
 
-                if (closest_itr->second.object_extended.obj_class.data != 0){ // if class is not point
-                        marker_array_closest_object.markers.push_back(mobject_closest);
-                        marker_array_closest_object.markers.push_back(mtext_closest);
+                closest_obj.header.frame_id = "/radar_closest_object";
+                closest_text.header.frame_id = "/radar_closest_object";
+                closest_text.pose.position.x = -10;
+                closest_text.pose.position.y =   5;
+                closest_text.pose.position.z = - 6; //4.0
+
+                if (closest_itr->second.object_extended.obj_class.data != 0) { // if class is not point
+                        marker_array_closest_object.markers.push_back(closest_obj);
+                        marker_array_closest_object.markers.push_back(closest_text);
                 }
         }
         //********************************************************************
@@ -762,8 +783,8 @@ void Radar_Conti::publish_object_map() {
         gps_text.type = 1; //Cube
         gps_text.action = 0; // add/modify
         gps_text.pose.position.x = -10;
-        gps_text.pose.position.y = 1;
-        gps_text.pose.position.z = -5; //4.0
+        gps_text.pose.position.y = - 4;
+        gps_text.pose.position.z = - 5; //4.0
 
         myQuaternion.setRPY(0, 0, 0);
         gps_text.pose.orientation.w = myQuaternion.getW();

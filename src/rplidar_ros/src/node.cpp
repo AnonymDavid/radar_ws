@@ -132,8 +132,8 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         closest_text.action = 0; // add/modify
 
         closest_text.pose.position.x = -4;
-        closest_text.pose.position.y = -7;
-        closest_text.pose.position.z = -5; //4.0
+        closest_text.pose.position.y = 0;
+        closest_text.pose.position.z = -3; //4.0
         closest_text.pose.orientation.w = myQuaternion.getW();
         closest_text.pose.orientation.x = myQuaternion.getX();
         closest_text.pose.orientation.y = myQuaternion.getY();
@@ -149,7 +149,7 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         
         std::stringstream ss2;
         ss2.precision(2);
-        ss2 << std::fixed << " Closest point: " << distance << " m";
+        ss2 << std::fixed << "Lidar closest point: " << distance << " m";
         closest_text.text = ss2.str();
 
 

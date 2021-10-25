@@ -14,7 +14,7 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="gps_broadcaster" args="1 0 0 0 0 0 base_link gps_data" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="radar_all_data_broadcaster" args="0 0 0 0 0 0 radar radar_all_data" />
   
-  <node pkg="tf2_ros" type="static_transform_publisher" name="lidar_closest_point_broadcaster" args="0 0 0 0 0 0 laser lidar_closest_point" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="lidar_closest_point_broadcaster" args="0 0 0 3.141593 0 0 laser lidar_closest_point" />
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/rplidar_and_radar.rviz" />
 </launch>

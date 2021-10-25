@@ -59,17 +59,17 @@ Visualization Manager:
         All Enabled: true
         base_link:
           Value: true
-        closest_point:
-          Value: true
         gps_data:
           Value: true
         laser:
+          Value: true
+        lidar_closest_point:
           Value: true
         radar:
           Value: true
         radar_all_data:
           Value: true
-        radar_closest:
+        radar_closest_object:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -78,18 +78,16 @@ Visualization Manager:
       Show Names: true
       Tree:
         base_link:
-          closest_point:
-            {}
           gps_data:
             {}
           laser:
-            {}
+            lidar_closest_point:
+              {}
           radar:
-            {}
-          radar_all_data:
-            {}
-          radar_closest:
-            {}
+            radar_all_data:
+              {}
+            radar_closest_object:
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -187,13 +185,15 @@ Visualization Manager:
       Queue Size: 100
       Value: false
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: /radar_closest_marker
       Name: Radar_closest_object
       Namespaces:
-        {}
+        "": true
+        objects: true
+        text: true
       Queue Size: 100
-      Value: false
+      Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /gps_data
@@ -230,7 +230,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 31.767534255981445
+      Distance: 38.709800720214844
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
