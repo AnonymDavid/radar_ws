@@ -100,7 +100,7 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         myQuaternion.setRPY(0, 0, 0);
 
         closest_point.header.stamp = ros::Time::now();
-        closest_point.header.frame_id = "closest_point";
+        closest_point.header.frame_id = "/lidar_closest_point";
         closest_point.ns = "objects";
         closest_point.id = 998;
         closest_point.type = 1; //Cube
@@ -125,7 +125,7 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         closest_point.frame_locked = false;
 
         closest_text.header.stamp = ros::Time::now();
-        closest_text.header.frame_id = "closest_point";
+        closest_text.header.frame_id = "/lidar_closest_point";
         closest_text.ns = "text";
         closest_text.id = 998;
         closest_text.type = 9; // Text
