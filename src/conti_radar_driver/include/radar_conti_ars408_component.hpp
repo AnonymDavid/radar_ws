@@ -33,7 +33,7 @@
 #include <cstddef>
 #include <set>
 #include <stdlib.h>
-
+#include <string>
 
 
 typedef unsigned char ubyte;
@@ -77,6 +77,7 @@ private:
     ros::Publisher pub_gps_data;
     ros::Publisher pub_closest_marker;
     ros::Publisher collison_obj_pub;
+    ros::Publisher pub_radar_closest_log;
     std::string pub_marker_array_topic_name = "/ars408/marker_array";
     // std::string pub_object_list_topic_name = "/ars408/objectlist";
     // std::string pub_tf_topic_name = "/tf";

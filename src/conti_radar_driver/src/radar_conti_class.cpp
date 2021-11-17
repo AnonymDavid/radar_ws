@@ -19,6 +19,7 @@ void Radar_Conti::init(can::DriverInterfaceSharedPtr &driver_)
     pub_marker_with_all_data = nh.advertise<visualization_msgs::MarkerArray>("radar_marker_with_all_data",0);
     pub_gps_data = nh.advertise<visualization_msgs::Marker>("gps_data",0);
     pub_closest_marker = nh.advertise<visualization_msgs::MarkerArray>("radar_closest_marker",0);
+    pub_radar_closest_log = nh.advertise<visualization_msgs::MarkerArray>("radar_closest_log",0);
 
     // GPS Speed to radar
     //Topic you want to publish
@@ -430,12 +431,15 @@ void Radar_Conti::publish_object_map() {
         visualization_msgs::MarkerArray marker_array;
         visualization_msgs::MarkerArray marker_array_all_data;
         visualization_msgs::MarkerArray marker_array_closest_object;
+        visualization_msgs::MarkerArray log_closest_marker_array;
         visualization_msgs::Marker gps_text;
 
         visualization_msgs::Marker closest_obj;
         visualization_msgs::Marker closest_text;
 
         tf2::Quaternion myQuaternion;
+
+        std::string log_text = "";
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
@@ -445,7 +449,9 @@ void Radar_Conti::publish_object_map() {
                 {
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
                         float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
-                
+
+                        std::string text = "";
+
                         visualization_msgs::Marker mobject;
                         visualization_msgs::Marker mobject_all;
                         visualization_msgs::Marker mtext;
@@ -581,6 +587,8 @@ void Radar_Conti::publish_object_map() {
                                 << " ProbOfExist: " << value << "%";
                                 mtext_all.text = ss_all.str();
                                 
+                                std::replace(ss_all.str().begin(), ss_all.str().end(), "\n", " ");
+                                log_text = ss_all.str();
                         }
                         // assign colors to each object ID (deterministic pseudo-random colors)
                         int i = int(itr->first);
@@ -611,11 +619,13 @@ void Radar_Conti::publish_object_map() {
                                         closest_itr = itr;
                                         closest_obj = mobject_all;
                                         closest_text = mtext_all;
+                                        log_text = text;
                                 }
                                 else if (closest_distance > itr_distance) {
                                         closest_itr = itr;
                                         closest_obj = mobject_all;
                                         closest_text = mtext_all;
+                                        log_text = text;
                                 }
 
                                 object_list_.objects.push_back(itr->second);
@@ -649,6 +659,10 @@ void Radar_Conti::publish_object_map() {
                 if (closest_itr->second.object_extended.obj_class.data != 0) { // if class is not point
                         marker_array_closest_object.markers.push_back(closest_obj);
                         marker_array_closest_object.markers.push_back(closest_text);
+
+                        closest_text.text = log_text;
+                        log_closest_marker_array.markers.push_back(closest_obj);
+                        log_closest_marker_array.markers.push_back(closest_text);
                 }
         }
         //********************************************************************
@@ -711,6 +725,7 @@ void Radar_Conti::publish_object_map() {
         pub_marker_with_all_data.publish(marker_array_all_data);
         pub_closest_marker.publish(marker_array_closest_object);
         pub_gps_data.publish(gps_text);
+        pub_radar_closest_log.publish(log_closest_marker_array);
 }
 
 void Radar_Conti::publish_cluster_map()
