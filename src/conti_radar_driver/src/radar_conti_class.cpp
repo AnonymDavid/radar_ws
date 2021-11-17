@@ -559,7 +559,7 @@ void Radar_Conti::publish_object_map() {
                         else
                         {
                                 double value = prob_of_exist_data((int)itr->second.object_quality.obj_probofexist.data);                                
-                                std::stringstream ss, ss_all;
+                                std::stringstream ss, ss_all, ss_wout_enter;
 
                                 ss.precision(2);
                                 ss << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
@@ -587,8 +587,20 @@ void Radar_Conti::publish_object_map() {
                                 << " ProbOfExist: " << value << "%";
                                 mtext_all.text = ss_all.str();
                                 
-                                std::replace(ss_all.str().begin(), ss_all.str().end(), "\n", " ");
-                                log_text = ss_all.str();
+                                ss_wout_enter.precision(2);
+                                ss_wout_enter << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << " "
+                                << "RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2 "
+                                << "D_long (x): " << itr->second.object_general.obj_distlong.data << " m "
+                                << "D_lat (y): " << itr->second.object_general.obj_distlat.data << " m "
+                                << "Distance: " << itr_distance << " m "
+                                << "Length (x): " << itr->second.object_extended.obj_length.data << " m "
+                                << "Width (y): " << itr->second.object_extended.obj_width.data << " m "
+                                << "Orientation: " << itr->second.object_extended.obj_orientationangle.data << "° "
+                                << "V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " " 
+                                << "V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " " 
+                                << "Class: " << object_classes[itr->second.object_extended.obj_class.data] << " "
+                                << "ProbOfExist: " << value << "%";
+                                text = ss_wout_enter.str();
                         }
                         // assign colors to each object ID (deterministic pseudo-random colors)
                         int i = int(itr->first);
@@ -660,7 +672,10 @@ void Radar_Conti::publish_object_map() {
                         marker_array_closest_object.markers.push_back(closest_obj);
                         marker_array_closest_object.markers.push_back(closest_text);
 
-                        closest_text.text = log_text;
+                        closest_text.text = log_text;//radar_closest_log
+                        closest_obj.header.frame_id = "/radar_closest_log";
+                        closest_text.header.frame_id = "/radar_closest_log";
+                
                         log_closest_marker_array.markers.push_back(closest_obj);
                         log_closest_marker_array.markers.push_back(closest_text);
                 }
