@@ -85,13 +85,13 @@ const double FILTERCFG_RES_PROBEXISTS = 1;
 // Index 9. Objects
 const int FILTERCFG_ACTIVE_Y = 1;
 const double FILTERCFG_MIN_Y = -1.7; // Lateral distance -409.5 - 409.5 m
-const double FILTERCFG_MAX_Y = 1.7;
+const double FILTERCFG_MAX_Y = 1.7; //TODO: teszthez 2, 3, 4, 5 látótávolságok -+ 
 const double FILTERCFG_MINIMUM_Y = -409.5;
 const double FILTERCFG_RES_Y = 0.2;
 // Index 10. Objects
-const int FILTERCFG_ACTIVE_X = 1;
+const int FILTERCFG_ACTIVE_X = 1;s
 const double FILTERCFG_MIN_X = 0; // Longitudinal distance -500 - 1138.2 m
-const double FILTERCFG_MAX_X = 35;
+const double FILTERCFG_MAX_X = 35; //TODO: teszthez fixre beállítani (20, 25, 30 méterre kb)
 const double FILTERCFG_MINIMUM_X = -500;
 const double FILTERCFG_RES_X = 0.2;
 // Index 11. Objects

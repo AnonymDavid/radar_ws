@@ -50,6 +50,7 @@ public:
 
 private:
     //Speed threshold
+    //TODO: test során a speed_thresholdot változtatni kell: 2, 3, 4, 5
     unsigned short speed_threshold = 3;
     bool is_speed_in_threshold(double object_speed);
     

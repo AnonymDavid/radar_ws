@@ -444,7 +444,7 @@ void Radar_Conti::publish_object_map() {
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
                         itr->second.object_general.obj_distlong.data != 0 &&
-                        itr->second.object_general.obj_distlat.data /*&&
+                        itr->second.object_general.obj_distlat.data /*&& //TODO: teszteléshez pár szcenárióhoz kell!
                         !is_speed_in_threshold((double)itr->second.object_general.obj_vrellong.data)*/)
                 {
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
