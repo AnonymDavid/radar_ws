@@ -48,7 +48,7 @@ const double FILTERCFG_RES_DISTANCE = 0.1;
 // Index 2. Clusters and objects
 const int FILTERCFG_ACTIVE_AZIMUTH = 0;
 const double FILTERCFG_MIN_AZIMUTH = -50; // Azimuth angle -50 - 52.375 deg
-const double FILTERCFG_MAX_AZIMUTH = 52.375;
+const double FILTERCFG_MAX_AZIMUTH = 50;
 const double FILTERCFG_MINIMUM_AZIMUTH = -50;
 const double FILTERCFG_RES_AZIMUTH = 0.025;
 // Index 3. Clusters and objects
@@ -64,7 +64,7 @@ const double FILTERCFG_RES_VRELDEPART= 0.0315;
 // Index 5. Clusters and objects
 const int FILTERCFG_ACTIVE_RCS = 1;
 const double FILTERCFG_MIN_RCS = -20; // Radar Cross Section -50 - 52.375 dBm2
-const double FILTERCFG_MAX_RCS = 20;
+const double FILTERCFG_MAX_RCS = 30;
 const double FILTERCFG_MINIMUM_RCS = -50;
 const double FILTERCFG_RES_RCS = 0.025;
 // Index 6. Objects
@@ -77,19 +77,19 @@ const int FILTERCFG_ACTIVE_SIZE = 0;
 const double FILTERCFG_MIN_SIZE = 0; // Area object size 0 - 102.375 m2
 const double FILTERCFG_MAX_SIZE = 102.375;
 const double FILTERCFG_RES_SIZE = 0.025;
-// Index 8. Objects
+// Index 8. Objectss
 const int FILTERCFG_ACTIVE_PROBEXISTS = 0;
 const double FILTERCFG_MIN_PROBEXISTS = 5; // Probability of existence
 const double FILTERCFG_MAX_PROBEXISTS = 7; //  0 0% - 1 25 % - 2 50 % - 3 75 % - 4 90 % - 5 99 % - 6 99.9 % - 7 100 %
 const double FILTERCFG_RES_PROBEXISTS = 1;
 // Index 9. Objects
 const int FILTERCFG_ACTIVE_Y = 1;
-const double FILTERCFG_MIN_Y = -1.7; // Lateral distance -409.5 - 409.5 m
-const double FILTERCFG_MAX_Y = 1.7; //TODO: teszthez 2, 3, 4, 5 látótávolságok -+ 
+const double FILTERCFG_MIN_Y = -3; // Lateral distance -409.5 - 409.5 m
+const double FILTERCFG_MAX_Y = 3; //TODO: teszthez 2, 3, 4, 5 látótávolságok -+ 
 const double FILTERCFG_MINIMUM_Y = -409.5;
 const double FILTERCFG_RES_Y = 0.2;
 // Index 10. Objects
-const int FILTERCFG_ACTIVE_X = 1;s
+const int FILTERCFG_ACTIVE_X = 1;
 const double FILTERCFG_MIN_X = 0; // Longitudinal distance -500 - 1138.2 m
 const double FILTERCFG_MAX_X = 35; //TODO: teszthez fixre beállítani (20, 25, 30 méterre kb)
 const double FILTERCFG_MINIMUM_X = -500;
