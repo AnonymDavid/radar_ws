@@ -49,6 +49,10 @@ public:
     void init(can::DriverInterfaceSharedPtr &driver_);
 
 private:
+    //video
+    ros::Publisher pub_video_obj_speed;
+    ros::Publisher pub_video_obj_distance;
+
     //Speed threshold
     //TODO: test során a speed_thresholdot változtatni kell: 2, 3, 4, 5
     unsigned short speed_threshold = 3;
