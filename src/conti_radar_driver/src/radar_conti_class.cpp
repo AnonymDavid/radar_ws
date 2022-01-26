@@ -461,11 +461,11 @@ void Radar_Conti::publish_object_map() {
                         std::string text = "";
 
                         visualization_msgs::Marker mobject;
-                        visualization_msgs::Marker mobject_all;
+                        //visualization_msgs::Marker mobject_all;
                         visualization_msgs::Marker mtext;
                         visualization_msgs::Marker mtext_all;
 
-                        visualization_msgs::Marker mobject_video_speed;
+                        //visualization_msgs::Marker mobject_video_speed;
                         visualization_msgs::Marker mtext_video_speed;
                         visualization_msgs::Marker mtext_video_distance;
 
@@ -586,7 +586,7 @@ void Radar_Conti::publish_object_map() {
                         mobject.scale.y = itr->second.object_extended.obj_width.data;
                         mobject.scale.z = 1.0;
                         
-
+                        /*
                         mobject_all.header.stamp = ros::Time::now();
                         mobject_all.header.frame_id = "/radar_all_data";
                         mobject_all.ns = "objects";
@@ -625,7 +625,7 @@ void Radar_Conti::publish_object_map() {
                         mobject_video_speed.scale.x = itr->second.object_extended.obj_length.data;
                         mobject_video_speed.scale.y = itr->second.object_extended.obj_width.data;
                         mobject_video_speed.scale.z = 1.0;
-
+                        */
 
                         if(collison_objects.find(itr->first) != collison_objects.end())
                         {
@@ -710,7 +710,7 @@ void Radar_Conti::publish_object_map() {
                         mobject.color.a = 0.6;
                         mobject.lifetime = ros::Duration(0.25);
                         mobject.frame_locked = false;
-
+                        /*
                         mobject_all.color.r = r;
                         mobject_all.color.g = g;
                         mobject_all.color.b = b;
@@ -724,23 +724,23 @@ void Radar_Conti::publish_object_map() {
                         mobject_video_speed.color.a = 0.6;
                         mobject_video_speed.lifetime = ros::Duration(0.25);
                         mobject_video_speed.frame_locked = false;
-
+                        */
                         //if (TODO){
                         if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
                                 if (closest_itr->second.object_general.obj_rcs.data == 0 && 
                                         closest_itr->second.object_general.obj_distlong.data == 0 &&
                                         closest_itr->second.object_general.obj_distlat.data == 0) {
                                         closest_itr = itr;
-                                        closest_obj = mobject_all;
+                                        closest_obj = mobject;
                                         closest_text = mtext_all;
-                                        video_obj_distance = mobject_all;
+                                        video_obj_distance = mobject;
                                         log_text = text;
                                 }
                                 else if (closest_distance > itr_distance) {
                                         closest_itr = itr;
-                                        closest_obj = mobject_all;
+                                        closest_obj = mobject;
                                         closest_text = mtext_all;
-                                        video_obj_distance = mobject_all;
+                                        video_obj_distance = mobject;
                                         log_text = text;
                                 }
 
@@ -748,10 +748,12 @@ void Radar_Conti::publish_object_map() {
                                 marker_array.markers.push_back(mobject);
                                 marker_array.markers.push_back(mtext);
 
-                                marker_array_all_data.markers.push_back(mobject_all);
+                                mobject.header.frame_id = "/radar_all_data";
+                                marker_array_all_data.markers.push_back(mobject);
                                 marker_array_all_data.markers.push_back(mtext_all);
                                 
-                                marker_video_obj_speed.markers.push_back(mobject_video_speed);
+                                mobject.header.frame_id = "/radar_video_speed";
+                                marker_video_obj_speed.markers.push_back(mobject);
                                 marker_video_obj_speed.markers.push_back(mtext_video_speed);
 
                         }
