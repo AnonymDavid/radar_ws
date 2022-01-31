@@ -22,6 +22,18 @@ apt-get install python-catkin-tools -y
 
 sudo apt-get install can-utils -y
 
+# Jetson fan configuration (FONTOS: kell hozzá git - sudo apt-get install git)
+# További infók: https://github.com/Pyrestone/jetson-fan-ctl
+# Hőmérséklet beállításhoz: sudo vi /etc/automagic-fan/config.json
+# i - szerkesztés
+# esc - kilépés szerkesztésből
+# :wq - esc után kell beírni, mentés
+# utána futtatni kell a sudo service automagic-fan restart parancsot, hogy újrainduljon a rendszer
+cd ~/Downloads
+git clone https://github.com/Pyrestone/jetson-fan-ctl.git
+cd jetson-fan-ctl
+sudo ./install.sh
+
 # Jetpack  4.2.1 telepitése esetén a következő parancsot is futtatni kell!
 # sudo apt-get install python3-catkin-tools
 
