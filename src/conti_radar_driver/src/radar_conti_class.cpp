@@ -444,6 +444,7 @@ void Radar_Conti::publish_object_map() {
         visualization_msgs::MarkerArray marker_video_obj_speed;
         visualization_msgs::MarkerArray marker_video_obj_distance;
         visualization_msgs::Marker video_obj_distance;
+        visualization_msgs::Marker mtext_video_distance;
 
         tf2::Quaternion myQuaternion;
 
@@ -467,8 +468,7 @@ void Radar_Conti::publish_object_map() {
 
                         //visualization_msgs::Marker mobject_video_speed;
                         visualization_msgs::Marker mtext_video_speed;
-                        visualization_msgs::Marker mtext_video_distance;
-
+                        
 
                         mtext.header.stamp = ros::Time::now();
                         mtext.header.frame_id = frame_id_;
@@ -688,13 +688,13 @@ void Radar_Conti::publish_object_map() {
                                 ss_v_speed << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
                                 << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
                                 << " V_long: " << (itr->second.object_general.obj_vrellong.data * 3.6) << "km/h" << " \n" 
-                                << " V_lat: " << (itr->second.object_general.obj_vrellat.data * 3.6) << "km/h" << " \n" 
+                                << " V_lat: " << (itr->second.object_general.obj_vrellat.data * 3.6) << "km/h" << " \n"; 
                                 mtext_video_speed.text = ss_v_speed.str();
 
                                 ss_v_distance.precision(2);
                                 ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
                                 << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " Distance: " << itr_distance << " m\n"
+                                << " Distance: " << itr_distance << " m\n";
                                 mtext_video_distance.text = ss_v_distance.str();
                         }
                         // assign colors to each object ID (deterministic pseudo-random colors)
