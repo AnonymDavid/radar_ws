@@ -628,10 +628,23 @@ void Radar_Conti::publish_object_map() {
                         mobject.frame_locked = false;
 
                         if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
-                                if ((closest_itr->second.object_general.obj_rcs.data == 0 && 
+                                if (closest_itr->second.object_general.obj_rcs.data == 0 && 
                                         closest_itr->second.object_general.obj_distlong.data == 0 &&
-                                        closest_itr->second.object_general.obj_distlat.data == 0) || 
-                                        (closest_distance > itr_distance)) {
+                                        closest_itr->second.object_general.obj_distlat.data == 0) {
+                                        closest_itr = itr;
+                                        closest_obj = mobject;
+                                        closest_text = mtext_all;
+                                        video_obj_distance = mobject;
+                                        
+                                        std::stringstream ss_v_distance;
+                                        ss_v_distance.precision(2);
+                                        ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+                                        << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+                                        << "Class: " << object_classes[itr->second.object_extended.obj_class.data] << " "
+                                        << " Distance: " << itr_distance << " m\n";
+                                        mtext_video_distance.text = ss_v_distance.str();
+                                }
+                                else if (closest_distance > itr_distance) {
                                         closest_itr = itr;
                                         closest_obj = mobject;
                                         closest_text = mtext_all;
