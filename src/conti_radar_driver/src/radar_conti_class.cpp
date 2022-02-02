@@ -640,7 +640,6 @@ void Radar_Conti::publish_object_map() {
                                         ss_v_distance.precision(2);
                                         ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
                                         << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                        << "Class: " << object_classes[itr->second.object_extended.obj_class.data] << " "
                                         << " Distance: " << itr_distance << " m\n";
                                         mtext_video_distance.text = ss_v_distance.str();
                                 }
@@ -654,7 +653,6 @@ void Radar_Conti::publish_object_map() {
                                         ss_v_distance.precision(2);
                                         ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
                                         << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                        << "Class: " << object_classes[itr->second.object_extended.obj_class.data] << " "
                                         << " Distance: " << itr_distance << " m\n";
                                         mtext_video_distance.text = ss_v_distance.str();
                                 }
@@ -698,8 +696,10 @@ void Radar_Conti::publish_object_map() {
                         marker_array_closest_object.markers.push_back(closest_obj);
                         marker_array_closest_object.markers.push_back(closest_text);
 
-                        marker_video_obj_distance.markers.push_back(mtext_video_distance);
-                        marker_video_obj_distance.markers.push_back(video_obj_distance);
+                        if (!mtext_video_distance.text.compare("")) {
+                                marker_video_obj_distance.markers.push_back(mtext_video_distance);
+                                marker_video_obj_distance.markers.push_back(video_obj_distance);
+                        }
                 }
         }
         //********************************************************************
