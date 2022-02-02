@@ -322,20 +322,6 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         gps_yaw_z = CALC_GPS_YAW_Z_YAW(GET_GPS_YAW_Z_YAW(msg.data), 1.0);
     }
 
-        if (send_gps_speed > 0){
-                send_gps_speed--;
-        }
-        else{
-                if (is_gps_speed_sending){
-                        send_GPS_speed();
-                }
-                else{
-                        send_GPS_yaw();
-                }
-                is_gps_speed_sending = !is_gps_speed_sending;
-
-                send_gps_speed = 2;
-        }
     //publish_object_map();
 }
 void Radar_Conti::handle_cluster_list(const can::Frame &msg)
@@ -691,11 +677,6 @@ void Radar_Conti::publish_object_map() {
                                 << " V_lat: " << (itr->second.object_general.obj_vrellat.data * 3.6) << "km/h" << " \n"; 
                                 mtext_video_speed.text = ss_v_speed.str();
 
-                                ss_v_distance.precision(2);
-                                ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " Distance: " << itr_distance << " m\n";
-                                mtext_video_distance.text = ss_v_distance.str();
                         }
                         // assign colors to each object ID (deterministic pseudo-random colors)
                         int i = int(itr->first);
@@ -734,6 +715,16 @@ void Radar_Conti::publish_object_map() {
                                         closest_obj = mobject;
                                         closest_text = mtext_all;
                                         video_obj_distance = mobject;
+                                        
+                                        std::stringstream ss_v_distance;
+                                        ss_v_distance.precision(2);
+                                        ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+                                        << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+                                        << "Class: " << object_classes[itr->second.object_extended.obj_class.data] << " "
+                                        << " Distance: " << itr_distance << " m\n";
+                                        mtext_video_distance.text = ss_v_distance.str();
+
+                                        
                                         log_text = text;
                                 }
                                 else if (closest_distance > itr_distance) {
@@ -741,6 +732,15 @@ void Radar_Conti::publish_object_map() {
                                         closest_obj = mobject;
                                         closest_text = mtext_all;
                                         video_obj_distance = mobject;
+
+                                        std::stringstream ss_v_distance;
+                                        ss_v_distance.precision(2);
+                                        ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+                                        << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+                                        << "Class: " << object_classes[itr->second.object_extended.obj_class.data] << " "
+                                        << " Distance: " << itr_distance << " m\n";
+                                        mtext_video_distance.text = ss_v_distance.str();
+
                                         log_text = text;
                                 }
 
