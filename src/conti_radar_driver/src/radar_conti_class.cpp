@@ -696,10 +696,8 @@ void Radar_Conti::publish_object_map() {
                         marker_array_closest_object.markers.push_back(closest_obj);
                         marker_array_closest_object.markers.push_back(closest_text);
 
-                        if (!mtext_video_distance.text.compare("")) {
-                                marker_video_obj_distance.markers.push_back(mtext_video_distance);
-                                marker_video_obj_distance.markers.push_back(video_obj_distance);
-                        }
+                        marker_video_obj_distance.markers.push_back(mtext_video_distance);
+                        marker_video_obj_distance.markers.push_back(video_obj_distance);
                 }
         }
         //********************************************************************
