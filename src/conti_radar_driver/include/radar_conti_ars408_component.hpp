@@ -6,6 +6,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include "ars_408_can_defines.h"
+#include "gps_can_defines.h"
 #include <socketcan_interface/socketcan.h>
 #include <socketcan_interface/threading.h>
 #include <socketcan_interface/string.h>
