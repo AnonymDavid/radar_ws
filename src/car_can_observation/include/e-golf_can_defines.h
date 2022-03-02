@@ -20,7 +20,7 @@
  */
 #define ID_ACC_PEDAL                            	0x391
 #define GET_ACC_PEDAL(buf) (0 \
-	| (ubyte)(+(ubyte)((buf[4] >> 0) & 0xff) << 0) \	
+	| (ubyte)(+(ubyte)((buf[4] >> 0) & 0xff) << 0) \
 )
 #define CALC_GPS_YAW_X_YAW(x, fmt) \
 	((x) * fmt * 0.61 + (-21.96))

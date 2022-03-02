@@ -37,9 +37,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
-  include/
+  include
+  src
 )
 
 
@@ -48,6 +48,6 @@ include_directories(
 #target_link_libraries(radar_info ${catkin_LIBRARIES})
 
 
-add_executable(car_can_observation src/car_can_class.cpp src/car_can_init.cpp)
+add_executable(car_can_observation src/car_can_init.cpp src/car_can_class.cpp)
 add_dependencies(car_can_observation ${car_can_observation_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(car_can_observation ${catkin_LIBRARIES})
