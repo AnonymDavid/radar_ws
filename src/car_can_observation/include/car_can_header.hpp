@@ -43,7 +43,6 @@ private:
     //can::DriverInterfaceSharedPtr radar_can_output;
 
     void handle_can_msg(const can::Frame &msg);
-    std::map<int,radar_conti::Object> object_map_;
 };
 
 #endif  // COMPOSITION__CAR_CAN_HEADER_HPP_
