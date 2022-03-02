@@ -34,6 +34,8 @@ void Radar_Conti::init(can::DriverInterfaceSharedPtr &driver_)
 
 void Radar_Conti::can_frame_callback(const can::Frame &msg)
 {
+handle_object_list(msg);
+
     if (msg.id == ID_RadarState) {
         operation_mode_ =CALC_RadarState_RadarState_OutputTypeCfg(GET_RadarState_RadarState_OutputTypeCfg(msg.data),1.0);
     }
@@ -319,6 +321,12 @@ void Radar_Conti::handle_object_list(const can::Frame &msg)
         gps_yaw_y = CALC_GPS_YAW_Y_YAW(GET_GPS_YAW_Y_YAW(msg.data), 1.0);
         
         gps_yaw_z = CALC_GPS_YAW_Z_YAW(GET_GPS_YAW_Z_YAW(msg.data), 1.0);
+    }
+
+    if (msg.id == ID_BRAKE_PEDAL) {
+            for (int i = 0; i < 8; i++)
+             ROS_INFO("data: %d",msg.data[i]);
+        ROS_INFO("break pedal: %d, %lf", ID_BRAKE_PEDAL, CALC_BRAKE_PEDAL(GET_BRAKE_PEDAL(msg.data), 1.0));
     }
 
     //publish_object_map();
@@ -627,7 +635,7 @@ void Radar_Conti::publish_object_map() {
                         mobject.lifetime = ros::Duration(0.25);
                         mobject.frame_locked = false;
 
-                        if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
+                        //if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
                                 if (closest_itr->second.object_general.obj_rcs.data == 0 && 
                                         closest_itr->second.object_general.obj_distlong.data == 0 &&
                                         closest_itr->second.object_general.obj_distlat.data == 0) {
@@ -669,7 +677,7 @@ void Radar_Conti::publish_object_map() {
                                 marker_video_obj_speed.markers.push_back(mobject);
                                 marker_video_obj_speed.markers.push_back(mtext_video_speed);
 
-                        }
+                        //}
                 }
 
         }
