@@ -6,3 +6,5 @@ ros_logs/*
 !ros_logs/lidar_log_readme.txt
 log_bags/*
 !log_bags/log_readme.txt
+output/*
+!output
