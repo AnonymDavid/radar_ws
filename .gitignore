@@ -8,3 +8,4 @@ log_bags/*
 !log_bags/log_readme.txt
 output/*
 !output
+.vscode/
