@@ -61,16 +61,6 @@ private:
     //TODO: test során a speed_thresholdot változtatni kell: 2, 3, 4, 5
     unsigned short speed_threshold = 3;
     bool is_speed_in_threshold(double object_speed);
-    
-
-    // GPS Speed
-    ros::NodeHandle n_; 
-    ros::Publisher pub_;
-    bool is_integer(float dec);
-    void send_GPS_speed();
-    void send_GPS_yaw();
-    bool is_gps_speed_sending = true;
-    int send_gps_speed = 2;
 
     ros::NodeHandle nh;
     //create CAN channel object
