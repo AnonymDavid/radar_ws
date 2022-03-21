@@ -28,12 +28,13 @@
 /**
  * Message EGOLF STEERING id.
  */
-#define ID_STEERING                           0x09F
+#define ID_STEERING                           0x086
 #define GET_STEERING(buf) (0 \
-	| (ubyte)(+(ubyte)((buf[0] >> 0) & 0xff) << 0) \
+	| (uword)(+(uword)((buf[2] >> 0) & 0xff) << 5) \
+	| (ubyte)(+(ubyte)((buf[3] << 3) & 0xff) >> 3) \
 )
 #define CALC_STEERING(x, fmt) \
-	((x) * fmt * 1)
+	((x) * fmt * 0.1)
 	
 /**
  * Message BRAKE_PEDAL id.

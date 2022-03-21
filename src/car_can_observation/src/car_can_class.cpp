@@ -16,7 +16,10 @@ void CarCanObservation::can_frame_callback(const can::Frame &msg)
 void CarCanObservation::handle_can_msg(const can::Frame &msg)
 {
     if (msg.id == ID_BRAKE_PEDAL) {
-        ROS_INFO("break pedal:  %.2lf", CALC_BRAKE_PEDAL(GET_BRAKE_PEDAL(msg.data), 1.0));
+        //ROS_INFO("break pedal:  %.2lf", CALC_BRAKE_PEDAL(GET_BRAKE_PEDAL(msg.data), 1.0));
+    }
+    if (msg.id == ID_STEERING) {
+        ROS_INFO("steering:  %.2lf", CALC_STEERING(GET_STEERING(msg.data), 1.0));
     }
 
 }
