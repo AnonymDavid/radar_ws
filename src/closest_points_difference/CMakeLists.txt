@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(diff_calculator)
+project(closest_points_difference)
 
 add_compile_options(-std=c++11)
 
@@ -31,4 +31,4 @@ add_executable(diffcalc src/calculator.cpp)
 
 target_link_libraries(diffcalc ${catkin_LIBRARIES})
 
-add_dependencies(diffcalc  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(diffcalc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
