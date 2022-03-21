@@ -58,6 +58,7 @@ static int closest_id = 0;
 ros::Publisher scan_pub;
 ros::Publisher scan_important_pub;
 ros::Publisher closest_point_pub;
+ros::Publisher pub_closest_str;
 
 sensor_msgs::LaserScan create_msg_header(size_t node_count, ros::Time start,
                   double scan_time, float angle_min, float angle_max,
@@ -152,6 +153,11 @@ void publish_closest_point(double pos_x, double pos_y, double distance)
         ss2 << std::fixed << "Lidar closest point: " << distance << " m";
         closest_text.text = ss2.str();
 
+        std_msgs::String closest_obj_str;
+        std::stringstream ss_closest_dist;
+        ss_closest_dist << distance;
+        closest_obj_str.data = ss_closest_dist.str();
+        pub_closest_str.publish(closest_obj_str);
 
         marker_array.markers.push_back(closest_point);
         marker_array.markers.push_back(closest_text);
@@ -345,6 +351,7 @@ int main(int argc, char * argv[]) {
     scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
     scan_important_pub = nh.advertise<sensor_msgs::LaserScan>("scan_important", 1000); //Lidar important data
     closest_point_pub = nh.advertise<visualization_msgs::MarkerArray>("closest_point", 1000);
+    pub_closest_str = nh.advertise<std_msgs::String>("lidar_closest_distance", 0);
     
 
     std::string channel_type;

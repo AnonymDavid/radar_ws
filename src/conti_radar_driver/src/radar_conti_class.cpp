@@ -19,6 +19,7 @@ void Radar_Conti::init(can::DriverInterfaceSharedPtr &driver_)
     pub_marker_with_all_data = nh.advertise<visualization_msgs::MarkerArray>("radar_marker_with_all_data",0);
     pub_gps_data = nh.advertise<visualization_msgs::Marker>("gps_data",0);
     pub_closest_marker = nh.advertise<visualization_msgs::MarkerArray>("radar_closest_marker",0);
+    pub_closest_str = nh.advertise<std_msgs::String>("radar_closest_distance", 0);
     
     //video
     pub_video_obj_speed = nh.advertise<visualization_msgs::MarkerArray>("radar_video_speed",0);
@@ -231,22 +232,14 @@ bool Radar_Conti::is_speed_in_threshold(double object_speed) {
 double Radar_Conti::prob_of_exist_data(int data)
 {
         switch (data) {
-                case 7:
-                        return 100.0;
-                case 6:
-                        return  99.9;
-                case 5:
-                        return  99.0;
-                case 4:
-                        return  90.0;
-                case 3:
-                        return  75.0;
-                case 2:
-                        return  50.0;
-                case 1:
-                        return  25.0;
-                default:
-                        return   0.0;
+                case 7: return 100.0;
+                case 6: return  99.9;
+                case 5: return  99.0;
+                case 4: return  90.0;
+                case 3: return  75.0;
+                case 2: return  50.0;
+                case 1: return  25.0;
+                default: return   0.0;
         }
         return 0.0;
 }
@@ -269,6 +262,8 @@ void Radar_Conti::publish_object_map() {
         visualization_msgs::Marker mtext_video_distance;
 
         tf2::Quaternion myQuaternion;
+
+        std_msgs::String closest_obj_str;
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
@@ -479,6 +474,11 @@ void Radar_Conti::publish_object_map() {
                                         ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
                                         << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
                                         << " Distance: " << itr_distance << " m\n";
+                                        
+                                        std::stringstream ss_closest_dist;
+                                        ss_closest_dist << itr_distance;
+                                        closest_obj_str.data = ss_closest_dist.str();
+
                                         mtext_video_distance.text = ss_v_distance.str();
                                 }
                                 else if (closest_distance > itr_distance) {
@@ -493,6 +493,10 @@ void Radar_Conti::publish_object_map() {
                                         << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
                                         << " Distance: " << itr_distance << " m\n";
                                         mtext_video_distance.text = ss_v_distance.str();
+
+                                        std::stringstream ss_closest_dist;
+                                        ss_closest_dist << itr_distance;
+                                        closest_obj_str.data = ss_closest_dist.str();
                                 }
 
                                 object_list_.objects.push_back(itr->second);
@@ -536,6 +540,8 @@ void Radar_Conti::publish_object_map() {
 
                         marker_video_obj_distance.markers.push_back(mtext_video_distance);
                         marker_video_obj_distance.markers.push_back(video_obj_distance);
+
+                        pub_closest_str.publish(closest_obj_str);
                 }
         }
         //********************************************************************
