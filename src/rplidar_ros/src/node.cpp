@@ -40,6 +40,7 @@
 #include <visualization_msgs/Marker.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <math.h> 
+#include "std_msgs/String.h"
 
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
