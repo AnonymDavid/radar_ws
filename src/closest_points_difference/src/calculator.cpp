@@ -1,6 +1,8 @@
 #include <ros/ros.h>
 #include "std_msgs/String.h"
 #include <fstream>
+#include <string>
+
 
 ros::Publisher pub_difference;
 double radarDistance;
@@ -9,7 +11,7 @@ double lidarDistance;
 
 void calculateDifference()
 {
-        ROS_INFO("R - L closest: %lf - %lf", radarDistance, lidarDistance);
+    //ROS_INFO("R - L closest: %lf - %lf", radarDistance, lidarDistance);
 
     if(radarDistance != -1 && lidarDistance != -1) {
         ROS_INFO("R - L closest: %lf - %lf", radarDistance, lidarDistance);
@@ -24,16 +26,16 @@ void calculateDifference()
 
 void radarDataCallback(const std_msgs::String::ConstPtr& msg)
 {
-    ROS_INFO("RADAR DATA: %s", msg->data.c_str());
-    //radarDistance = std::stod(msg->data.c_str());
-    //calculateDifference();
+    //ROS_INFO("RADAR DATA: %s", msg->data.c_str());
+    radarDistance = std::atof(msg->data.c_str());
+    calculateDifference();
 }
 
 void lidarDataCallback(const std_msgs::String::ConstPtr& msg)
 {
-    ROS_INFO("LIDAR: %s", msg->data.c_str());
-    //lidarDistance = std::stod(msg->data.c_str());
-    //calculateDifference();
+    //ROS_INFO("LIDAR: %s", msg->data.c_str());
+    lidarDistance = std::atof(msg->data.c_str());
+    calculateDifference();
 }
 
 int main( int argc, char** argv )
