@@ -268,7 +268,8 @@ void Radar_Conti::publish_object_map() {
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
                 if (itr->second.object_general.obj_rcs.data != 0 &&
                         itr->second.object_general.obj_distlong.data != 0 &&
-                        itr->second.object_general.obj_distlat.data /*&& //TODO: teszteléshez pár szcenárióhoz kell!
+                        itr->second.object_general.obj_distlat.data /*&& //csak autók vizsgálata
+                        itr->second.object_extended.obj_class.data != 0 /*&& //gyorsaság threshold
                         !is_speed_in_threshold((double)itr->second.object_general.obj_vrellong.data)*/)
                 {
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
@@ -303,7 +304,9 @@ void Radar_Conti::publish_object_map() {
                         mtext.lifetime = ros::Duration(0.25);
                         mtext.frame_locked = false;
 
-
+                        mtext_all = mtext;
+                        mtext_all.header.frame_id = "/radar_all_data";
+                        /*
                         mtext_all.header.stamp = ros::Time::now();
                         mtext_all.header.frame_id = "/radar_all_data";
                         mtext_all.ns = "text";
@@ -326,8 +329,11 @@ void Radar_Conti::publish_object_map() {
                         mtext_all.color.a = 1.0;
                         mtext_all.lifetime = ros::Duration(0.25);
                         mtext_all.frame_locked = false;
+                        */
 
-
+                        mtext_video_speed = mtext;
+                        mtext_video_speed.header.frame_id = "/radar_video_speed";
+                        /*
                         mtext_video_speed.header.stamp = ros::Time::now();
                         mtext_video_speed.header.frame_id = "/radar_video_speed";
                         mtext_video_speed.ns = "text";
@@ -350,8 +356,11 @@ void Radar_Conti::publish_object_map() {
                         mtext_video_speed.color.a = 1.0;
                         mtext_video_speed.lifetime = ros::Duration(0.25);
                         mtext_video_speed.frame_locked = false;
+                        */
 
-                        
+                        mtext_video_distance = mtext;
+                        mtext_video_distance.header.frame_id = "/radar_video_distance";
+                        /*
                         mtext_video_distance.header.stamp = ros::Time::now();
                         mtext_video_distance.header.frame_id = "/radar_video_distance";
                         mtext_video_distance.ns = "text";
@@ -374,7 +383,7 @@ void Radar_Conti::publish_object_map() {
                         mtext_video_distance.color.a = 1.0;
                         mtext_video_distance.lifetime = ros::Duration(0.25);
                         mtext_video_distance.frame_locked = false;
-
+                        */
 
 
                         mobject.header.stamp = ros::Time::now();
@@ -460,60 +469,57 @@ void Radar_Conti::publish_object_map() {
                         mobject.lifetime = ros::Duration(0.25);
                         mobject.frame_locked = false;
 
-                        //if (itr->second.object_extended.obj_class.data != 0){ // if class is not point
-                                if (closest_itr->second.object_general.obj_rcs.data == 0 && 
-                                        closest_itr->second.object_general.obj_distlong.data == 0 &&
-                                        closest_itr->second.object_general.obj_distlat.data == 0) {
-                                        closest_itr = itr;
-                                        closest_obj = mobject;
-                                        closest_text = mtext_all;
-                                        video_obj_distance = mobject;
-                                        
-                                        std::stringstream ss_v_distance;
-                                        ss_v_distance.precision(2);
-                                        ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                        << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                        << " Distance: " << itr_distance << " m\n";
-                                        
-                                        std::stringstream ss_closest_dist;
-                                        ss_closest_dist << itr_distance;
-                                        closest_obj_str.data = ss_closest_dist.str();
-
-                                        mtext_video_distance.text = ss_v_distance.str();
-                                }
-                                else if (closest_distance > itr_distance) {
-                                        closest_itr = itr;
-                                        closest_obj = mobject;
-                                        closest_text = mtext_all;
-                                        video_obj_distance = mobject;
-                                        
-                                        std::stringstream ss_v_distance;
-                                        ss_v_distance.precision(2);
-                                        ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                        << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                        << " Distance: " << itr_distance << " m\n";
-                                        mtext_video_distance.text = ss_v_distance.str();
-
-                                        std::stringstream ss_closest_dist;
-                                        ss_closest_dist << itr_distance;
-                                        closest_obj_str.data = ss_closest_dist.str();
-                                }
-
-                                object_list_.objects.push_back(itr->second);
-                                marker_array.markers.push_back(mobject);
-                                marker_array.markers.push_back(mtext);
-
-                                mobject.header.frame_id = "/radar_all_data";
-                                marker_array_all_data.markers.push_back(mobject);
-                                marker_array_all_data.markers.push_back(mtext_all);
+                        if ( (closest_distance > itr_distance) /*|| //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell) 
+                                (closest_itr->second.object_extended.obj_class.data == 0)*/) {
+                                closest_itr = itr;
+                                closest_obj = mobject;
+                                closest_text = mtext_all;
+                                video_obj_distance = mobject;
                                 
-                                mobject.header.frame_id = "/radar_video_speed";
-                                marker_video_obj_speed.markers.push_back(mobject);
-                                marker_video_obj_speed.markers.push_back(mtext_video_speed);
+                                std::stringstream ss_v_distance;
+                                ss_v_distance.precision(2);
+                                ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+                                << " Distance: " << itr_distance << " m\n";
+                                
+                                std::stringstream ss_closest_dist;
+                                ss_closest_dist << itr_distance;
+                                closest_obj_str.data = ss_closest_dist.str();
 
-                        //}
+                                mtext_video_distance.text = ss_v_distance.str();
+                        }
+                        /*
+                        else if (closest_distance > itr_distance) {
+                                closest_itr = itr;
+                                closest_obj = mobject;
+                                closest_text = mtext_all;
+                                video_obj_distance = mobject;
+                                
+                                std::stringstream ss_v_distance;
+                                ss_v_distance.precision(2);
+                                ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+                                << " Distance: " << itr_distance << " m\n";
+                                mtext_video_distance.text = ss_v_distance.str();
+
+                                std::stringstream ss_closest_dist;
+                                ss_closest_dist << itr_distance;
+                                closest_obj_str.data = ss_closest_dist.str();
+                        }
+                        */
+
+                        object_list_.objects.push_back(itr->second);
+                        marker_array.markers.push_back(mobject);
+                        marker_array.markers.push_back(mtext);
+
+                        mobject.header.frame_id = "/radar_all_data";
+                        marker_array_all_data.markers.push_back(mobject);
+                        marker_array_all_data.markers.push_back(mtext_all);
+                        
+                        mobject.header.frame_id = "/radar_video_speed";
+                        marker_video_obj_speed.markers.push_back(mobject);
+                        marker_video_obj_speed.markers.push_back(mtext_video_speed);
                 }
-
         }
 
         //********************************************************************
@@ -522,9 +528,8 @@ void Radar_Conti::publish_object_map() {
         //******************************        ******************************
         //********************************************************************
 
-        if (closest_itr->second.object_general.obj_rcs.data != 0 &&
-                closest_itr->second.object_general.obj_distlong.data != 0 &&
-                closest_itr->second.object_general.obj_distlat.data != 0) {
+        if (true /*&& //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
+                closest_itr->second.object_extended.obj_class.data != 0*/) {
 
                 closest_obj.header.frame_id = "/radar_closest_object";
                 closest_text.header.frame_id = "/radar_closest_object";
@@ -534,15 +539,13 @@ void Radar_Conti::publish_object_map() {
 
                 video_obj_distance.header.frame_id = "/radar_video_distance";
 
-                if (closest_itr->second.object_extended.obj_class.data != 0) { // if class is not point
-                        marker_array_closest_object.markers.push_back(closest_obj);
-                        marker_array_closest_object.markers.push_back(closest_text);
+                marker_array_closest_object.markers.push_back(closest_obj);
+                marker_array_closest_object.markers.push_back(closest_text);
 
-                        marker_video_obj_distance.markers.push_back(mtext_video_distance);
-                        marker_video_obj_distance.markers.push_back(video_obj_distance);
+                marker_video_obj_distance.markers.push_back(mtext_video_distance);
+                marker_video_obj_distance.markers.push_back(video_obj_distance);
 
-                        pub_closest_str.publish(closest_obj_str);
-                }
+                pub_closest_str.publish(closest_obj_str);
         }
         //********************************************************************
         //******************************        ******************************
