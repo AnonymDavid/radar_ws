@@ -244,6 +244,38 @@ double Radar_Conti::prob_of_exist_data(int data)
         return 0.0;
 }
 
+visualization_msgs::Marker createTextMarker(
+        std::map<int, radar_conti::Object>::iterator itr, 
+        const std::string& topic_name, tf2::Quaternion myQuaternion)
+{
+        visualization_msgs::Marker makertext;
+
+        markertext.header.stamp = ros::Time::now();
+        markertext.header.frame_id = frame_id_;
+        markertext.ns = "text";
+        markertext.id = (itr->first+100);
+        markertext.type=9;
+        markertext.action = 0; // add/modify
+        markertext.pose.position.x = itr->second.object_general.obj_distlong.data;
+        markertext.pose.position.y = itr->second.object_general.obj_distlat.data;
+        markertext.pose.position.z = 6; //4.0
+
+        myQuaternion.setRPY(0, 0, 0);
+        markertext.pose.orientation.w = myQuaternion.getW();
+        markertext.pose.orientation.x = myQuaternion.getX();
+        markertext.pose.orientation.y = myQuaternion.getY();
+        markertext.pose.orientation.z = myQuaternion.getZ();
+        markertext.scale.z = 1.0;
+        markertext.color.r = 1.0;
+        markertext.color.g = 1.0;
+        markertext.color.b = 1.0;
+        markertext.color.a = 1.0;
+        markertext.lifetime = ros::Duration(0.25);
+        markertext.frame_locked = false;
+
+        return markertext;
+}
+
 void Radar_Conti::publish_object_map() {
         std::map<int, radar_conti::Object>::iterator itr;
         std::map<int, radar_conti::Object>::iterator closest_itr = object_map_.begin();
@@ -276,11 +308,11 @@ void Radar_Conti::publish_object_map() {
                         float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
 
                         visualization_msgs::Marker mobject;
-                        visualization_msgs::Marker mtext;
-                        visualization_msgs::Marker mtext_all;
-                        visualization_msgs::Marker mtext_video_speed;
-                        
-
+                        visualization_msgs::Marker mtext = createTextMarker(itr, "/radar", myQuaternion);
+                        visualization_msgs::Marker mtext_all = createTextMarker(itr, "/radar_all_data", myQuaternion);
+                        visualization_msgs::Marker mtext_video_speed = createTextMarker(itr, "/radar_video_speed", myQuaternion);
+                        mtext_video_distance = createTextMarker(itr, "/radar_video_distance", myQuaternion);
+/*
                         mtext.header.stamp = ros::Time::now();
                         mtext.header.frame_id = frame_id_;
                         mtext.ns = "text";
@@ -329,11 +361,11 @@ void Radar_Conti::publish_object_map() {
                         mtext_all.color.a = 1.0;
                         mtext_all.lifetime = ros::Duration(0.25);
                         mtext_all.frame_locked = false;
-                        */
+                        
 
                         mtext_video_speed = mtext;
                         mtext_video_speed.header.frame_id = "/radar_video_speed";
-                        /*
+                        
                         mtext_video_speed.header.stamp = ros::Time::now();
                         mtext_video_speed.header.frame_id = "/radar_video_speed";
                         mtext_video_speed.ns = "text";
@@ -356,11 +388,11 @@ void Radar_Conti::publish_object_map() {
                         mtext_video_speed.color.a = 1.0;
                         mtext_video_speed.lifetime = ros::Duration(0.25);
                         mtext_video_speed.frame_locked = false;
-                        */
+                        
 
                         mtext_video_distance = mtext;
                         mtext_video_distance.header.frame_id = "/radar_video_distance";
-                        /*
+                        
                         mtext_video_distance.header.stamp = ros::Time::now();
                         mtext_video_distance.header.frame_id = "/radar_video_distance";
                         mtext_video_distance.ns = "text";
