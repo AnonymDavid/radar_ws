@@ -239,26 +239,28 @@ double Radar_Conti::prob_of_exist_data(int data)
                 case 3: return  75.0;
                 case 2: return  50.0;
                 case 1: return  25.0;
-                default: return   0.0;
+                default: return  0.0;
         }
         return 0.0;
 }
 
-visualization_msgs::Marker createTextMarker(
+visualization_msgs::Marker Radar_Conti::createMarker(
         std::map<int, radar_conti::Object>::iterator itr, 
-        const std::string& topic_name, tf2::Quaternion myQuaternion)
+        const std::string topic_name, tf2::Quaternion& myQuaternion,
+        const std::string ns_name, int id,
+        double x, double y, double z)
 {
-        visualization_msgs::Marker makertext;
+        visualization_msgs::Marker markertext;
 
         markertext.header.stamp = ros::Time::now();
-        markertext.header.frame_id = frame_id_;
-        markertext.ns = "text";
-        markertext.id = (itr->first+100);
-        markertext.type=9;
+        markertext.header.frame_id = topic_name;
+        markertext.ns = ns_name;
+        markertext.id = id;
+        markertext.type = (ns_name == "objects" ? 1 : 9);
         markertext.action = 0; // add/modify
-        markertext.pose.position.x = itr->second.object_general.obj_distlong.data;
-        markertext.pose.position.y = itr->second.object_general.obj_distlat.data;
-        markertext.pose.position.z = 6; //4.0
+        markertext.pose.position.x = (x == 0 ? itr->second.object_general.obj_distlong.data : x);
+        markertext.pose.position.y = (y == 0 ? itr->second.object_general.obj_distlat.data : y);
+        markertext.pose.position.z = z; //4.0
 
         myQuaternion.setRPY(0, 0, 0);
         markertext.pose.orientation.w = myQuaternion.getW();
@@ -273,7 +275,45 @@ visualization_msgs::Marker createTextMarker(
         markertext.lifetime = ros::Duration(0.25);
         markertext.frame_locked = false;
 
+        if (ns_name == "objects") {
+                markertext.scale.x = itr->second.object_extended.obj_length.data;
+                markertext.scale.y = itr->second.object_extended.obj_width.data;
+                markertext.scale.z = 1.0;
+        }
+
         return markertext;
+}
+
+std::string Radar_Conti::createTextMessage(
+        const std::string ss_name, double distance,
+        std::map<int, radar_conti::Object>::iterator itr)
+{
+        std::stringstream ss;
+        ss.precision(2);
+        ss << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
+        << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
+        << " Distance: " << distance << " m\n"; //closest distance return
+        if (ss_name == "radar_all_data") {
+                ss << " D_long (x): " << itr->second.object_general.obj_distlong.data << " m\n"
+                << " D_lat (y): " << itr->second.object_general.obj_distlat.data << " m\n"
+                << " Length (x): " << itr->second.object_extended.obj_length.data << " m\n"
+                << " Width (y): " << itr->second.object_extended.obj_width.data << " m\n"
+                << " Orientation: " << itr->second.object_extended.obj_orientationangle.data << "°\n"
+                << " V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " \n" 
+                << " V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " \n" 
+                << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
+                << " ProbOfExist: " << prob_of_exist_data((int)itr->second.object_quality.obj_probofexist.data) << "%";
+        }
+        else if (ss_name == "radar" || ss_name == "video_speed") {
+                ss << " V_long: " << (itr->second.object_general.obj_vrellong.data * 3.6) << "km/h" << " \n" 
+                << " V_lat: " << (itr->second.object_general.obj_vrellat.data * 3.6)<< "km/h" << " \n";
+                if (ss_name == "radar") {
+                        ss << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
+                        << " ProbOfExist: " << prob_of_exist_data((int)itr->second.object_quality.obj_probofexist.data) << "%";
+                }
+        }
+
+        return ss.str();
 }
 
 void Radar_Conti::publish_object_map() {
@@ -283,7 +323,6 @@ void Radar_Conti::publish_object_map() {
         visualization_msgs::MarkerArray marker_array;
         visualization_msgs::MarkerArray marker_array_all_data;
         visualization_msgs::MarkerArray marker_array_closest_object;
-        visualization_msgs::Marker gps_text;
 
         visualization_msgs::Marker closest_obj;
         visualization_msgs::Marker closest_text;
@@ -308,134 +347,13 @@ void Radar_Conti::publish_object_map() {
                         float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
 
                         visualization_msgs::Marker mobject;
-                        visualization_msgs::Marker mtext = createTextMarker(itr, "/radar", myQuaternion);
-                        visualization_msgs::Marker mtext_all = createTextMarker(itr, "/radar_all_data", myQuaternion);
-                        visualization_msgs::Marker mtext_video_speed = createTextMarker(itr, "/radar_video_speed", myQuaternion);
-                        mtext_video_distance = createTextMarker(itr, "/radar_video_distance", myQuaternion);
-/*
-                        mtext.header.stamp = ros::Time::now();
-                        mtext.header.frame_id = frame_id_;
-                        mtext.ns = "text";
-                        mtext.id = (itr->first+100);
-                        mtext.type=9;
-                        mtext.action = 0; // add/modify
-                        mtext.pose.position.x = itr->second.object_general.obj_distlong.data;
-                        mtext.pose.position.y = itr->second.object_general.obj_distlat.data;
-                        mtext.pose.position.z = 6; //4.0
-
-                        myQuaternion.setRPY(0, 0, 0);
-                        mtext.pose.orientation.w = myQuaternion.getW();
-                        mtext.pose.orientation.x = myQuaternion.getX();
-                        mtext.pose.orientation.y = myQuaternion.getY();
-                        mtext.pose.orientation.z = myQuaternion.getZ();
-                        mtext.scale.z = 1.0;
-                        mtext.color.r = 1.0;
-                        mtext.color.g = 1.0;
-                        mtext.color.b = 1.0;
-                        mtext.color.a = 1.0;
-                        mtext.lifetime = ros::Duration(0.25);
-                        mtext.frame_locked = false;
-
-                        mtext_all = mtext;
-                        mtext_all.header.frame_id = "/radar_all_data";
-                        /*
-                        mtext_all.header.stamp = ros::Time::now();
-                        mtext_all.header.frame_id = "/radar_all_data";
-                        mtext_all.ns = "text";
-                        mtext_all.id = (itr->first+100);
-                        mtext_all.type=9;
-                        mtext_all.action = 0; // add/modify
-                        mtext_all.pose.position.x = itr->second.object_general.obj_distlong.data;
-                        mtext_all.pose.position.y = itr->second.object_general.obj_distlat.data;
-                        mtext_all.pose.position.z = 6; //4.0
-
-                        myQuaternion.setRPY(0, 0, 0);
-                        mtext_all.pose.orientation.w = myQuaternion.getW();
-                        mtext_all.pose.orientation.x = myQuaternion.getX();
-                        mtext_all.pose.orientation.y = myQuaternion.getY();
-                        mtext_all.pose.orientation.z = myQuaternion.getZ();
-                        mtext_all.scale.z = 1.0;
-                        mtext_all.color.r = 1.0;
-                        mtext_all.color.g = 1.0;
-                        mtext_all.color.b = 1.0;
-                        mtext_all.color.a = 1.0;
-                        mtext_all.lifetime = ros::Duration(0.25);
-                        mtext_all.frame_locked = false;
+                        visualization_msgs::Marker mtext = createMarker(itr, "/radar", myQuaternion, "text", (itr->first + 100));
+                        visualization_msgs::Marker mtext_all = createMarker(itr, "/radar_all_data", myQuaternion, "text", (itr->first + 100));
+                        visualization_msgs::Marker mtext_video_speed = createMarker(itr, "/radar_video_speed", myQuaternion, "text", (itr->first + 100));
+                        mtext_video_distance = createMarker(itr, "/radar_video_distance", myQuaternion, "text", (itr->first + 100), -5, 2, -6);
                         
-
-                        mtext_video_speed = mtext;
-                        mtext_video_speed.header.frame_id = "/radar_video_speed";
-                        
-                        mtext_video_speed.header.stamp = ros::Time::now();
-                        mtext_video_speed.header.frame_id = "/radar_video_speed";
-                        mtext_video_speed.ns = "text";
-                        mtext_video_speed.id = (itr->first+100);
-                        mtext_video_speed.type=9;
-                        mtext_video_speed.action = 0; // add/modify
-                        mtext_video_speed.pose.position.x = itr->second.object_general.obj_distlong.data;
-                        mtext_video_speed.pose.position.y = itr->second.object_general.obj_distlat.data;
-                        mtext_video_speed.pose.position.z = 6; //4.0
-
-                        myQuaternion.setRPY(0, 0, 0);
-                        mtext_video_speed.pose.orientation.w = myQuaternion.getW();
-                        mtext_video_speed.pose.orientation.x = myQuaternion.getX();
-                        mtext_video_speed.pose.orientation.y = myQuaternion.getY();
-                        mtext_video_speed.pose.orientation.z = myQuaternion.getZ();
-                        mtext_video_speed.scale.z = 1.0;
-                        mtext_video_speed.color.r = 1.0;
-                        mtext_video_speed.color.g = 1.0;
-                        mtext_video_speed.color.b = 1.0;
-                        mtext_video_speed.color.a = 1.0;
-                        mtext_video_speed.lifetime = ros::Duration(0.25);
-                        mtext_video_speed.frame_locked = false;
-                        
-
-                        mtext_video_distance = mtext;
-                        mtext_video_distance.header.frame_id = "/radar_video_distance";
-                        
-                        mtext_video_distance.header.stamp = ros::Time::now();
-                        mtext_video_distance.header.frame_id = "/radar_video_distance";
-                        mtext_video_distance.ns = "text";
-                        mtext_video_distance.id = (itr->first+100);
-                        mtext_video_distance.type=9;
-                        mtext_video_distance.action = 0; // add/modify
-                        mtext_video_distance.pose.position.x = -10;
-                        mtext_video_distance.pose.position.y =   5;
-                        mtext_video_distance.pose.position.z = - 6;
-
-                        myQuaternion.setRPY(0, 0, 0);
-                        mtext_video_distance.pose.orientation.w = myQuaternion.getW();
-                        mtext_video_distance.pose.orientation.x = myQuaternion.getX();
-                        mtext_video_distance.pose.orientation.y = myQuaternion.getY();
-                        mtext_video_distance.pose.orientation.z = myQuaternion.getZ();
-                        mtext_video_distance.scale.z = 1.0;
-                        mtext_video_distance.color.r = 1.0;
-                        mtext_video_distance.color.g = 1.0;
-                        mtext_video_distance.color.b = 1.0;
-                        mtext_video_distance.color.a = 1.0;
-                        mtext_video_distance.lifetime = ros::Duration(0.25);
-                        mtext_video_distance.frame_locked = false;
-                        */
-
-
-                        mobject.header.stamp = ros::Time::now();
-                        mobject.header.frame_id = frame_id_;
-                        mobject.ns = "objects";
-                        mobject.id = itr->first;
-                        mobject.type = 1; //Cube
-                        mobject.action = 0; // add/modify
-                        mobject.pose.position.x = itr->second.object_general.obj_distlong.data;
-                        mobject.pose.position.y = itr->second.object_general.obj_distlat.data;
-                        mobject.pose.position.z = 0.0;
-
                         myQuaternion.setRPY(0, 0, itr->second.object_extended.obj_orientationangle.data);
-                        mobject.pose.orientation.w = myQuaternion.getW();
-                        mobject.pose.orientation.x = myQuaternion.getX();
-                        mobject.pose.orientation.y = myQuaternion.getY();
-                        mobject.pose.orientation.z = myQuaternion.getZ();
-                        mobject.scale.x = itr->second.object_extended.obj_length.data;
-                        mobject.scale.y = itr->second.object_extended.obj_width.data;
-                        mobject.scale.z = 1.0;
+                        mobject = createMarker(itr, "/radar", myQuaternion, "objects", itr->first, 0, 0, 1);
 
                         if(collison_objects.find(itr->first) != collison_objects.end())
                         {
@@ -450,41 +368,9 @@ void Radar_Conti::publish_object_map() {
                         }
                         else
                         {
-                                double value = prob_of_exist_data((int)itr->second.object_quality.obj_probofexist.data);                                
-                                std::stringstream ss, ss_all, ss_v_speed;
-
-                                ss.precision(2);
-                                ss << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " Distance: " << itr_distance << " m\n"
-                                << " V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " \n" 
-                                << " V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " \n" 
-                                << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
-                                << " ProbOfExist: " << value << "%";
-                                mtext.text = ss.str();
-
-
-                                ss_all.precision(2);
-                                ss_all << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " D_long (x): " << itr->second.object_general.obj_distlong.data << " m\n"
-                                << " D_lat (y): " << itr->second.object_general.obj_distlat.data << " m\n"
-                                << " Distance: " << itr_distance << " m\n"
-                                << " Length (x): " << itr->second.object_extended.obj_length.data << " m\n"
-                                << " Width (y): " << itr->second.object_extended.obj_width.data << " m\n"
-                                << " Orientation: " << itr->second.object_extended.obj_orientationangle.data << "°\n"
-                                << " V_long: " << itr->second.object_general.obj_vrellong.data << "m/s" << " \n" 
-                                << " V_lat: " << itr->second.object_general.obj_vrellat.data << "m/s" << " \n" 
-                                << " Class: " << object_classes[itr->second.object_extended.obj_class.data] << "\n"
-                                << " ProbOfExist: " << value << "%";
-                                mtext_all.text = ss_all.str();
-
-                                ss_v_speed.precision(2);
-                                ss_v_speed << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " V_long: " << (itr->second.object_general.obj_vrellong.data * 3.6) << "km/h" << " \n" 
-                                << " V_lat: " << (itr->second.object_general.obj_vrellat.data * 3.6) << "km/h" << " \n"; 
-                                mtext_video_speed.text = ss_v_speed.str();
+                                mtext.text = createTextMessage("radar", itr_distance, itr);
+                                mtext_all.text = createTextMessage("radar_all_data", itr_distance, itr);
+                                mtext_video_speed.text = createTextMessage("video_speed", itr_distance, itr);
 
                         }
                         // assign colors to each object ID (deterministic pseudo-random colors)
@@ -501,44 +387,17 @@ void Radar_Conti::publish_object_map() {
                         mobject.lifetime = ros::Duration(0.25);
                         mobject.frame_locked = false;
 
-                        if ( (closest_distance > itr_distance) /*|| //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell) 
+                        if ( (closest_distance > itr_distance) || 
+                                (closest_itr == object_map_.begin()) /*|| //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell) 
                                 (closest_itr->second.object_extended.obj_class.data == 0)*/) {
                                 closest_itr = itr;
                                 closest_obj = mobject;
                                 closest_text = mtext_all;
-                                video_obj_distance = mobject;
                                 
-                                std::stringstream ss_v_distance;
-                                ss_v_distance.precision(2);
-                                ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " Distance: " << itr_distance << " m\n";
-                                
-                                std::stringstream ss_closest_dist;
-                                ss_closest_dist << itr_distance;
-                                closest_obj_str.data = ss_closest_dist.str();
+                                mtext_video_distance.text = createTextMessage("video_closest_distance", itr_distance, itr);
 
-                                mtext_video_distance.text = ss_v_distance.str();
+                                closest_obj_str.data = std::to_string(itr_distance);
                         }
-                        /*
-                        else if (closest_distance > itr_distance) {
-                                closest_itr = itr;
-                                closest_obj = mobject;
-                                closest_text = mtext_all;
-                                video_obj_distance = mobject;
-                                
-                                std::stringstream ss_v_distance;
-                                ss_v_distance.precision(2);
-                                ss_v_distance << std::fixed << "object_" << std::fixed << std::setprecision(1) << itr->first << "\n"
-                                << " RCS: " << itr->second.object_general.obj_rcs.data << " dBm^2\n"
-                                << " Distance: " << itr_distance << " m\n";
-                                mtext_video_distance.text = ss_v_distance.str();
-
-                                std::stringstream ss_closest_dist;
-                                ss_closest_dist << itr_distance;
-                                closest_obj_str.data = ss_closest_dist.str();
-                        }
-                        */
 
                         object_list_.objects.push_back(itr->second);
                         marker_array.markers.push_back(mobject);
@@ -560,22 +419,26 @@ void Radar_Conti::publish_object_map() {
         //******************************        ******************************
         //********************************************************************
 
-        if (true /*&& //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
+        if (sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2)) != 0
+                /*&& //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
                 closest_itr->second.object_extended.obj_class.data != 0*/) {
 
                 closest_obj.header.frame_id = "/radar_closest_object";
                 closest_text.header.frame_id = "/radar_closest_object";
                 closest_text.pose.position.x = -10;
                 closest_text.pose.position.y =   5;
-                closest_text.pose.position.z = - 6; //4.0
+                closest_text.pose.position.z = - 6;
 
-                video_obj_distance.header.frame_id = "/radar_video_distance";
+                closest_obj.header.frame_id = "/radar_video_distance";
+                mtext_video_distance.pose.position.x = - 5;
+                mtext_video_distance.pose.position.y =   2;
+                mtext_video_distance.pose.position.z = - 6;
 
                 marker_array_closest_object.markers.push_back(closest_obj);
                 marker_array_closest_object.markers.push_back(closest_text);
 
+                marker_video_obj_distance.markers.push_back(closest_obj);
                 marker_video_obj_distance.markers.push_back(mtext_video_distance);
-                marker_video_obj_distance.markers.push_back(video_obj_distance);
 
                 pub_closest_str.publish(closest_obj_str);
         }
@@ -584,36 +447,11 @@ void Radar_Conti::publish_object_map() {
         //*************************  G P S  T E X T  *************************
         //******************************        ******************************
         //********************************************************************
-
-        gps_text.header.stamp = ros::Time::now();
-        gps_text.header.frame_id = "/gps_data";
-        gps_text.ns = "text";
-        gps_text.id = 998;
-        gps_text.type = 1; //Cube
-        gps_text.action = 0; // add/modify
-        gps_text.pose.position.x = -10;
-        gps_text.pose.position.y = - 4;
-        gps_text.pose.position.z = - 5; //4.0
-
         myQuaternion.setRPY(0, 0, 0);
-        gps_text.pose.orientation.w = myQuaternion.getW();
-        gps_text.pose.orientation.x = myQuaternion.getX();
-        gps_text.pose.orientation.y = myQuaternion.getY();
-        gps_text.pose.orientation.z = myQuaternion.getZ();
+        visualization_msgs::Marker gps_text = createMarker(closest_itr, "/gps_data", myQuaternion, "text", 998, -10, -4, -5);;
 
-        gps_text.scale.z = 1.0;
-        gps_text.color.r = 1.0;
-        gps_text.color.g = 1.0;
-        gps_text.color.b = 1.0;
-        gps_text.color.a = 1.0;
-        gps_text.lifetime = ros::Duration(0.25);
-        gps_text.frame_locked = false;
-        gps_text.type=9;
-
-        
         std::stringstream ss2;
         ss2.precision(2);
-
         ss2 << std::fixed << "GPS DATA:\n"
         << " GPS speed: " << gps_speed << " Km/h\n"
         << " GPS altitude: " << gps_altitude << " m\n"
@@ -628,7 +466,7 @@ void Radar_Conti::publish_object_map() {
 
         //********************************************************************
         //******************************        ******************************
-        //******************  P U B L I S H  T O  R V I Z  *******************
+        //*****************  P U B L I S H   T O   R V I Z  ******************
         //******************************        ******************************
         //********************************************************************
 

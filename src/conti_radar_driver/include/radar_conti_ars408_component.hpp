@@ -61,7 +61,8 @@ private:
     //TODO: test során a speed_thresholdot változtatni kell: 2, 3, 4, 5
     unsigned short speed_threshold = 3;
     bool is_speed_in_threshold(double object_speed);
-    visualization_msgs::Marker createTextMarker(std::map<int, radar_conti::Object>::iterator itr, const std::string& topic_name, tf2::Quaternion myQuaternion);
+    visualization_msgs::Marker createMarker(std::map<int, radar_conti::Object>::iterator itr, const std::string topic_name, tf2::Quaternion& myQuaternion, const std::string ns_name, int id, double x = 0, double y = 0, double z = 6);
+    std::string createTextMessage(const std::string ss_name, double distance, std::map<int, radar_conti::Object>::iterator itr);
 
     ros::NodeHandle nh;
     //create CAN channel object
