@@ -350,7 +350,7 @@ void Radar_Conti::publish_object_map() {
                         visualization_msgs::Marker mtext = createMarker(itr, "/radar", myQuaternion, "text", (itr->first + 100));
                         visualization_msgs::Marker mtext_all = createMarker(itr, "/radar_all_data", myQuaternion, "text", (itr->first + 100));
                         visualization_msgs::Marker mtext_video_speed = createMarker(itr, "/radar_video_speed", myQuaternion, "text", (itr->first + 100));
-                        closest_text = createMarker(itr, "/radar_closest_object", myQuaternion, "text", (itr->first + 100), -10, 5, -6);
+                        closest_text = createMarker(itr, "/radar_closest_object", myQuaternion, "text", (itr->first + 100), -5, 5, -11);
                         mtext_video_distance = createMarker(itr, "/radar_video_distance", myQuaternion, "text", (itr->first + 100), -5, 2, -6);
                         
 
@@ -446,7 +446,7 @@ void Radar_Conti::publish_object_map() {
         //******************************        ******************************
         //********************************************************************
         myQuaternion.setRPY(0, 0, 0);
-        visualization_msgs::Marker gps_text = createMarker(closest_itr, "/gps_data", myQuaternion, "text", 998, -10, -4, -5);;
+        visualization_msgs::Marker gps_text = createMarker(closest_itr, "/gps_data", myQuaternion, "text", 998, -5, -4, -10);;
 
         std::stringstream ss2;
         ss2.precision(2);

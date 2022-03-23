@@ -4,8 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Radar_closest_object1
-        - /gps_data1
+        - /R-L_closest_difference1
       Splitter Ratio: 0.5558823347091675
     Tree Height: 441
   - Class: rviz/Selection
@@ -71,6 +70,12 @@ Visualization Manager:
           Value: true
         radar_closest_object:
           Value: true
+        radar_lidar_closest_difference:
+          Value: true
+        radar_video_distance:
+          Value: true
+        radar_video_speed:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -88,14 +93,27 @@ Visualization Manager:
               {}
             radar_closest_object:
               {}
+            radar_video_distance:
+              {}
+            radar_video_speed:
+              {}
+          radar_lidar_closest_difference:
+            {}
       Update Interval: 0
       Value: true
-    - Class: rviz/MarkerArray
+    - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /radar_objects_marker
-      Name: Radar
+      Marker Topic: /egolf_3d/egolf_marker
+      Name: golf
       Namespaces:
-        objects: true
+        egolf_base: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /gps_data
+      Name: gps_data
+      Namespaces:
         text: true
       Queue Size: 100
       Value: true
@@ -114,9 +132,7 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 47
       Min Color: 0; 0; 0
-      Min Intensity: 47
       Name: Lidar
       Position Transformer: XYZ
       Queue Size: 100
@@ -144,9 +160,7 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 138; 226; 52
-      Max Intensity: 47
       Min Color: 78; 154; 6
-      Min Intensity: 47
       Name: Lidar_important
       Position Transformer: XYZ
       Queue Size: 10
@@ -168,12 +182,13 @@ Visualization Manager:
         text: true
       Queue Size: 100
       Value: true
-    - Class: rviz/Marker
+    - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /egolf_3d/egolf_marker
-      Name: golf
+      Marker Topic: /radar_objects_marker
+      Name: Radar
       Namespaces:
-        egolf_base: true
+        objects: true
+        text: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -189,15 +204,30 @@ Visualization Manager:
       Marker Topic: /radar_closest_marker
       Name: Radar_closest_object
       Namespaces:
-        "": true
         objects: true
         text: true
       Queue Size: 100
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /radar_video_distance
+      Name: Radar_video_distance
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /radar_video_speed
+      Name: Radar_video_speed
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /gps_data
-      Name: gps_data
+      Marker Topic: /radar_lidar_closest_difference
+      Name: R-L_closest_difference
       Namespaces:
         text: true
       Queue Size: 100
@@ -230,7 +260,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 38.709800720214844
+      Distance: 37.69133758544922
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -245,18 +275,18 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6603983640670776
+      Pitch: 0.4203985035419464
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.145411252975464
+      Yaw: 3.1403965950012207
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
   Height: 716
   Hide Left Dock: false
-  Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000015600000244fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002700000244000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f00000244fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000002700000244000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004f30000003efc0100000002fb0000000800540069006d00650100000000000004f3000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000002820000024400000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Hide Right Dock: true
+  QMainWindow State: 000000ff00000000fd00000004000000000000015600000244fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002700000244000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f00000244fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000002700000244000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004f30000003efc0100000002fb0000000800540069006d00650100000000000004f3000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000003970000024400000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -264,7 +294,7 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Views:
-    collapsed: false
+    collapsed: true
   Width: 1267
   X: 65
   Y: 24
