@@ -350,8 +350,10 @@ void Radar_Conti::publish_object_map() {
                         visualization_msgs::Marker mtext = createMarker(itr, "/radar", myQuaternion, "text", (itr->first + 100));
                         visualization_msgs::Marker mtext_all = createMarker(itr, "/radar_all_data", myQuaternion, "text", (itr->first + 100));
                         visualization_msgs::Marker mtext_video_speed = createMarker(itr, "/radar_video_speed", myQuaternion, "text", (itr->first + 100));
+                        closest_text = createMarker(itr, "/radar_closest_object", myQuaternion, "text", (itr->first + 100), -10, 5, -6);
                         mtext_video_distance = createMarker(itr, "/radar_video_distance", myQuaternion, "text", (itr->first + 100), -5, 2, -6);
                         
+
                         myQuaternion.setRPY(0, 0, itr->second.object_extended.obj_orientationangle.data);
                         mobject = createMarker(itr, "/radar", myQuaternion, "objects", itr->first, 0, 0, 1);
 
@@ -392,8 +394,8 @@ void Radar_Conti::publish_object_map() {
                                 (closest_itr->second.object_extended.obj_class.data == 0)*/) {
                                 closest_itr = itr;
                                 closest_obj = mobject;
-                                closest_text = mtext_all;
-                                
+
+                                closest_text.text = createTextMessage("radar_all_data", itr_distance, itr);
                                 mtext_video_distance.text = createTextMessage("video_closest_distance", itr_distance, itr);
 
                                 closest_obj_str.data = std::to_string(itr_distance);
@@ -418,30 +420,23 @@ void Radar_Conti::publish_object_map() {
         //*******************  C L O S E S T  O B J E C T  *******************
         //******************************        ******************************
         //********************************************************************
-
         if (sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2)) != 0
                 /*&& //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
                 closest_itr->second.object_extended.obj_class.data != 0*/) {
 
                 closest_obj.header.frame_id = "/radar_closest_object";
-                closest_text.header.frame_id = "/radar_closest_object";
-                closest_text.pose.position.x = -10;
-                closest_text.pose.position.y =   5;
-                closest_text.pose.position.z = - 6;
-
-                closest_obj.header.frame_id = "/radar_video_distance";
-                mtext_video_distance.pose.position.x = - 5;
-                mtext_video_distance.pose.position.y =   2;
-                mtext_video_distance.pose.position.z = - 6;
-
                 marker_array_closest_object.markers.push_back(closest_obj);
                 marker_array_closest_object.markers.push_back(closest_text);
 
+                closest_obj.header.frame_id = "/radar_video_distance";
                 marker_video_obj_distance.markers.push_back(closest_obj);
                 marker_video_obj_distance.markers.push_back(mtext_video_distance);
 
+                pub_closest_marker.publish(marker_array_closest_object);
+                pub_video_obj_distance.publish(marker_video_obj_distance);
                 pub_closest_str.publish(closest_obj_str);
         }
+
         //********************************************************************
         //******************************        ******************************
         //*************************  G P S  T E X T  *************************
@@ -469,16 +464,10 @@ void Radar_Conti::publish_object_map() {
         //*****************  P U B L I S H   T O   R V I Z  ******************
         //******************************        ******************************
         //********************************************************************
-
-
-        //collison_obj_pub.publish(coll_list);
-        //pub_objects.publish(object_list_);
         pub_marker.publish(marker_array);
         pub_marker_with_all_data.publish(marker_array_all_data);
-        pub_closest_marker.publish(marker_array_closest_object);
         pub_gps_data.publish(gps_text);
         pub_video_obj_speed.publish(marker_video_obj_speed);
-        pub_video_obj_distance.publish(marker_video_obj_distance);
 }
 
 void Radar_Conti::publish_cluster_map()
