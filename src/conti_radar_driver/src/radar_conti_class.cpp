@@ -424,17 +424,20 @@ void Radar_Conti::publish_object_map() {
                 /*&& //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
                 closest_itr->second.object_extended.obj_class.data != 0*/) {
 
-                closest_obj.header.frame_id = "/radar_closest_object";
-                marker_array_closest_object.markers.push_back(closest_obj);
-                marker_array_closest_object.markers.push_back(closest_text);
-
-                closest_obj.header.frame_id = "/radar_video_distance";
-                marker_video_obj_distance.markers.push_back(closest_obj);
-                marker_video_obj_distance.markers.push_back(mtext_video_distance);
-
-                pub_closest_marker.publish(marker_array_closest_object);
-                pub_video_obj_distance.publish(marker_video_obj_distance);
-                pub_closest_str.publish(closest_obj_str);
+                if (closest_text.header.frame_id == "/radar_closest_object") {
+                        closest_obj.header.frame_id = "/radar_closest_object";
+                        marker_array_closest_object.markers.push_back(closest_obj);
+                        marker_array_closest_object.markers.push_back(closest_text);
+                        pub_closest_marker.publish(marker_array_closest_object);
+                        pub_closest_str.publish(closest_obj_str);
+                }
+                
+                if (mtext_video_distance.header.frame_id == "/radar_video_distance") {
+                        closest_obj.header.frame_id = "/radar_video_distance";
+                        marker_video_obj_distance.markers.push_back(closest_obj);
+                        marker_video_obj_distance.markers.push_back(mtext_video_distance);
+                        pub_video_obj_distance.publish(marker_video_obj_distance);
+                }
         }
 
         //********************************************************************

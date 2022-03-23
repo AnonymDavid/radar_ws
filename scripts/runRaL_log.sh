@@ -3,12 +3,12 @@
 if [ $1 != "" ] && [ -d `dirname "$1"` ]
 then
 	~/radar_ws/scripts/runRaL.sh &
-	P6=$!
+	P100=$!
 	sleep 10s
 	rosbag record -O $1 -a
-	P7=$!
+	P101=$!
 	
-	wait $P6 $P7
+	wait $P100 $P101
 else
 	echo "Path doesn't exists"
 fi
