@@ -32,7 +32,7 @@ void differencePublisher()
         marker.action = 0;
         marker.pose.position.x = -5;
         marker.pose.position.y =  0;
-        marker.pose.position.z = -3;
+        marker.pose.position.z = -3; //12 prezentáláshoz, különben -3
 
         myQuaternion.setRPY(0, 0, 0);
         marker.pose.orientation.w = myQuaternion.getW();

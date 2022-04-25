@@ -38,7 +38,7 @@ const int FILTERCFG_TYPE = 1; // Choose between objects and clusters 0 cluster -
 // Index 0. Clusters and objects
 const int FILTERCFG_ACTIVE_NOFOBJ = 1;
 const double FILTERCFG_MIN_NOFOBJ = 0; // Number of clusters or objects 0 - 4095
-const double FILTERCFG_MAX_NOFOBJ = 3;
+const double FILTERCFG_MAX_NOFOBJ = 8;
 const double FILTERCFG_RES_NOFOBJ = 1;
 // Index 1. Clusters and objects
 const int FILTERCFG_ACTIVE_DISTANCE = 1;
@@ -63,8 +63,8 @@ const double FILTERCFG_MAX_VRELDEPART = 128.993; // 0 - 128.993 m/s
 const double FILTERCFG_RES_VRELDEPART= 0.0315;
 // Index 5. Clusters and objects
 const int FILTERCFG_ACTIVE_RCS = 1;
-const double FILTERCFG_MIN_RCS = -20; // Radar Cross Section -50 - 52.375 dBm2
-const double FILTERCFG_MAX_RCS = 30;
+const double FILTERCFG_MIN_RCS = -10; // Radar Cross Section -50 - 52.375 dBm2
+const double FILTERCFG_MAX_RCS = 35;
 const double FILTERCFG_MINIMUM_RCS = -50;
 const double FILTERCFG_RES_RCS = 0.025;
 // Index 6. Objects
@@ -84,14 +84,14 @@ const double FILTERCFG_MAX_PROBEXISTS = 7; //  0 0% - 1 25 % - 2 50 % - 3 75 % -
 const double FILTERCFG_RES_PROBEXISTS = 1;
 // Index 9. Objects
 const int FILTERCFG_ACTIVE_Y = 1;
-const double FILTERCFG_MIN_Y = -2; // Lateral distance -409.5 - 409.5 m
-const double FILTERCFG_MAX_Y = 2; //TODO: teszthez 2, 3, 4, 5 látótávolságok -+ 
+const double FILTERCFG_MIN_Y = -2.0; // Lateral distance -409.5 - 409.5 m
+const double FILTERCFG_MAX_Y = 2.0; //TODO: teszthez 2, 3, 4, 5 látótávolságok -+ 
 const double FILTERCFG_MINIMUM_Y = -409.5;
 const double FILTERCFG_RES_Y = 0.2;
 // Index 10. Objects
 const int FILTERCFG_ACTIVE_X = 1;
 const double FILTERCFG_MIN_X = 0; // Longitudinal distance -500 - 1138.2 m
-const double FILTERCFG_MAX_X = 6; //TODO: teszthez fixre beállítani (20, 25, 30 méterre kb)
+const double FILTERCFG_MAX_X = 25; //TODO: teszthez fixre beállítani (20, 25, 30 méterre kb)
 const double FILTERCFG_MINIMUM_X = -500;
 const double FILTERCFG_RES_X = 0.2;
 // Index 11. Objects

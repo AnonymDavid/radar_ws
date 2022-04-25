@@ -225,6 +225,7 @@ void Radar_Conti::handle_cluster_list(const can::Frame &msg)
 }
 
 bool Radar_Conti::is_speed_in_threshold(double object_speed) {
+        ROS_INFO("%lf", (gps_speed + object_speed));
         return (gps_speed + object_speed) < speed_threshold &&
                 (gps_speed + object_speed) > -speed_threshold;
 }
@@ -272,7 +273,7 @@ visualization_msgs::Marker Radar_Conti::createMarker(
         markertext.color.g = 1.0;
         markertext.color.b = 1.0;
         markertext.color.a = 1.0;
-        markertext.lifetime = ros::Duration(0.25);
+        markertext.lifetime = ros::Duration(1);
         markertext.frame_locked = false;
 
         if (ns_name == "objects") {
@@ -337,12 +338,11 @@ void Radar_Conti::publish_object_map() {
         std_msgs::String closest_obj_str;
 
         for (itr = object_map_.begin(); itr != object_map_.end(); ++itr) {
-                if (itr->second.object_general.obj_rcs.data != 0 &&
-                        itr->second.object_general.obj_distlong.data != 0 &&
-                        itr->second.object_general.obj_distlat.data /*&& //csak autók vizsgálata
-                        itr->second.object_extended.obj_class.data != 0 /*&& //gyorsaság threshold
-                        !is_speed_in_threshold((double)itr->second.object_general.obj_vrellong.data)*/)
-                {
+                if (itr->second.object_general.obj_distlong.data != 0 &&
+                        itr->second.object_general.obj_distlat.data != 0 //csak autók vizsgálata
+                        && itr->second.object_extended.obj_class.data != 0 //gyorsaság threshold
+                        //&& !is_speed_in_threshold(((double)itr->second.object_general.obj_vrellong.data) * 3.6)
+                ){
                         float itr_distance = sqrt(pow(itr->second.object_general.obj_distlong.data, 2) + pow(itr->second.object_general.obj_distlat.data, 2));
                         float closest_distance = sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2));
 
@@ -386,7 +386,7 @@ void Radar_Conti::publish_object_map() {
                         mobject.color.g = g;
                         mobject.color.b = b;
                         mobject.color.a = 0.6;
-                        mobject.lifetime = ros::Duration(0.25);
+                        mobject.lifetime = ros::Duration(1);
                         mobject.frame_locked = false;
 
                         if ( (closest_distance > itr_distance) || 
@@ -421,8 +421,8 @@ void Radar_Conti::publish_object_map() {
         //******************************        ******************************
         //********************************************************************
         if (sqrt(pow(closest_itr->second.object_general.obj_distlong.data, 2) + pow(closest_itr->second.object_general.obj_distlat.data, 2)) != 0
-                /*&& //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
-                closest_itr->second.object_extended.obj_class.data != 0*/) {
+                //&& closest_itr->second.object_extended.obj_class.data != 0 //akkor kell, ha nem vizsgálunk pontokat (csak jármű kell)
+                ){
 
                 if (closest_text.header.frame_id == "/radar_closest_object") {
                         closest_obj.header.frame_id = "/radar_closest_object";
@@ -509,7 +509,7 @@ void Radar_Conti::publish_cluster_map()
         mEgoCar.color.g = 0.0;
         mEgoCar.color.b = 1.0;
         mEgoCar.color.a = 1.0;
-        mEgoCar.lifetime = ros::Duration(0.2);
+        mEgoCar.lifetime = ros::Duration(1);
         mEgoCar.frame_locked = false;
 
         marker_array.markers.push_back(mEgoCar);
@@ -544,7 +544,7 @@ void Radar_Conti::publish_cluster_map()
                 mtext.color.g = 1.0;
                 mtext.color.b = 1.0;
                 mtext.color.a = 1.0;
-                mtext.lifetime = ros::Duration(0.2);
+                mtext.lifetime = ros::Duration(1);
                 mtext.frame_locked = false;
                 mtext.type=9;
                 mtext.text= "Cluster" + std::to_string(itr->first) + ": \n" 
@@ -581,7 +581,7 @@ void Radar_Conti::publish_cluster_map()
                 mobject.color.g = 1.0;
                 mobject.color.b = 0.0;
                 mobject.color.a = 1.0;
-                mobject.lifetime = ros::Duration(0.2);
+                mobject.lifetime = ros::Duration(1);
                 mobject.frame_locked = false;
 
                 cluster_list.clusters.push_back(itr->second);

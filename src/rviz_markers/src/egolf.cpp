@@ -3,7 +3,6 @@
 #include "std_msgs/String.h"
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_broadcaster.h>
-#include <fstream>
 
 geometry_msgs::Pose location;
 
@@ -67,18 +66,12 @@ int main( int argc, char** argv )
     transform.setOrigin( tf::Vector3(location.position.x,location.position.y,location.position.z) );
     transform.setRotation(tf::Quaternion(location.orientation.x,location.orientation.y,location.orientation.z,location.orientation.w));
 
-    std::ofstream file_to_write;
-    file_to_write.open("../output/logtest.txt", std::ios_base::app);
-
     
     while(ros::ok()) 
     {
 
         golf_marker.header.stamp = ros::Time::now();
         golf_marker.lifetime = ros::Duration();
-        if (file_to_write.is_open()) {
-            file_to_write << golf_marker.header.stamp << ";" << golf_marker.pose.position.x << ";" <<  golf_marker.pose.position.y << ";" <<  golf_marker.pose.position.z<< std::endl;
-        }
         marker_pub.publish(golf_marker);
         
         ros::spinOnce();
